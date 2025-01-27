@@ -6,8 +6,7 @@ exports.handler = async (event) => {
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
 
-    console.log('Auth Code:', code);
-    console.log('Redirect URI:', redirectUri);
+    console.log('Starting token exchange...');
 
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
@@ -24,7 +23,7 @@ exports.handler = async (event) => {
     });
 
     const tokens = await tokenResponse.json();
-    console.log('Token Response:', tokens);
+    console.log('Token received:', tokens);
 
     return {
         statusCode: 302,

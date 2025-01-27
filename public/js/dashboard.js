@@ -1,6 +1,8 @@
 const dashboard = {
     init: async function () {
+        console.log('Dashboard initializing...');
         console.log('Cookies:', document.cookie);
+
         const token = document.cookie
             .split('; ')
             .find(row => row.startsWith('discord_token='))
@@ -13,8 +15,12 @@ const dashboard = {
             return;
         }
 
-        await this.loadUserProfile(token);
-        await this.loadUserServers(token);
+        try {
+            await this.loadUserProfile(token);
+            await this.loadUserServers(token);
+        } catch (error) {
+            console.error('Dashboard initialization failed:', error);
+        }
     },
 
     loadUserProfile: async function (token) {

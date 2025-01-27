@@ -9,11 +9,15 @@
 </head>
 
 <body>
-    <div class="dashboard-container">
+    <nav class="dashboard-nav">
         <div class="user-profile">
             <img id="userAvatar" src="" alt="User Avatar">
-            <h2 id="userName"></h2>
+            <span id="userName"></span>
         </div>
+        <button onclick="dashboard.logout()">Logout</button>
+    </nav>
+    <div class="dashboard-container">
+        <h1>Your Discord Servers</h1>
         <div id="servers-container"></div>
     </div>
     <script src="/js/dashboard.js"></script>
