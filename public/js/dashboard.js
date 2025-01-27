@@ -1,110 +1,58 @@
-class Dashboard {
-    constructor() {
-        this.init();
-    }
+const dashboard = {
+    init: async function () {
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('discord_token='))
+            ?.split('=')[1];
 
-    async init() {
-        const token = this.getCookie('discord_token');
         if (!token) {
             window.location.href = '/.netlify/functions/auth';
             return;
         }
-        await this.loadUserData(token);
-        this.setupEventListeners();
-    }
 
-    async loadUserData(token) {
-        try {
-            const response = await fetch('https://discord.com/api/users/@me', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            const userData = await response.json();
-            this.renderDashboard(userData);
-        } catch (error) {
-            console.error('Failed to load user data:', error);
-            window.location.href = '/.netlify/functions/auth';
-        }
-    }
+        await this.loadUserProfile(token);
+        await this.loadUserServers(token);
+    },
 
-    renderDashboard(userData) {
-        document.getElementById('app').innerHTML = `
-            <nav class="sidebar">
-                <div class="user-profile">
-                    <img src="https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png" alt="Profile">
-                    <span>${userData.username}</span>
-                </div>
-                <ul class="nav-links">
-                    <li class="active">Overview</li>
-                    <li>Servers</li>
-                    <li>Scripts</li>
-                    <li>Settings</li>
-                </ul>
-                <button class="logout-btn" onclick="dashboard.logout()">Logout</button>
-            </nav>
-            <main class="dashboard-content">
-                <div class="servers-grid" id="servers-container">
-                    Loading servers...
-                </div>
-            </main>
-        `;
-        this.loadServers();
-    }
+    loadUserProfile: async function (token) {
+        const response = await fetch('https://discord.com/api/users/@me', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const user = await response.json();
 
-    async loadServers() {
-        const token = this.getCookie('discord_token');
-        try {
-            const response = await fetch('https://discord.com/api/users/@me/guilds', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            const servers = await response.json();
-            this.renderServers(servers);
-        } catch (error) {
-            console.error('Failed to load servers:', error);
-        }
-    }
+        document.getElementById('userName').textContent = user.username;
+        document.getElementById('userAvatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+    },
 
-    renderServers(servers) {
+    loadUserServers: async function (token) {
+        const response = await fetch('https://discord.com/api/users/@me/guilds', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const servers = await response.json();
+
         const container = document.getElementById('servers-container');
         container.innerHTML = servers.map(server => `
             <div class="server-card">
-                ${server.icon 
-                    ? `<img src="https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png" alt="${server.name}">`
-                    : ''}
+                <img src="https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png" alt="${server.name}">
                 <h3>${server.name}</h3>
-                <span class="status-badge">Active</span>
+                <button onclick="dashboard.configureServer('${server.id}')">Configure</button>
             </div>
         `).join('');
-    }
+    },
 
-    setupEventListeners() {
-        document.querySelectorAll('.nav-links li').forEach(link => {
-            link.addEventListener('click', (e) => {
-                this.handleNavigation(e.currentTarget.textContent.trim());
-            });
-        });
-    }
+    configureServer: function (serverId) {
+        // Server configuration logic will go here
+        console.log(`Configuring server: ${serverId}`);
+    },
 
-    handleNavigation(section) {
-        document.querySelectorAll('.nav-links li').forEach(link => {
-            link.classList.remove('active');
-        });
-        document.querySelector(`.nav-links li:contains('${section}')`).classList.add('active');
-    }
-
-    logout() {
+    logout: function () {
         document.cookie = 'discord_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         window.location.href = '/';
     }
+};
 
-    getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-}
-
-const dashboard = new Dashboard();
+document.addEventListener('DOMContentLoaded', () => dashboard.init());
