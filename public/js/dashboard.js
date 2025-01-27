@@ -1,5 +1,10 @@
 const dashboard = {
     init: async function () {
+        // Remove the ?code parameter from URL first
+        if (window.location.search.includes('code')) {
+            window.history.replaceState({}, document.title, '/dashboard.html');
+        }
+
         console.log('Dashboard initializing...');
         console.log('Cookies:', document.cookie);
 
