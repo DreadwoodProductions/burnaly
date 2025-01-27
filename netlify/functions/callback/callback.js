@@ -6,7 +6,6 @@ exports.handler = async (event) => {
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
 
-    // Get Discord tokens
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
@@ -20,17 +19,9 @@ exports.handler = async (event) => {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
     });
+
     const tokens = await tokenResponse.json();
 
-    // Get user data immediately to verify token
-    const userResponse = await fetch('https://discord.com/api/users/@me', {
-        headers: {
-            Authorization: `Bearer ${tokens.access_token}`
-        }
-    });
-    const userData = await userResponse.json();
-
-    // Combine cookies into a single string separated by semicolons
     const cookieString = [
         `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`,
         `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`
@@ -40,9 +31,7 @@ exports.handler = async (event) => {
         statusCode: 302,
         headers: {
             'Set-Cookie': cookieString,
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
+            'Cache-Control': 'no-cache',
             'Location': '/dashboard.html'
         }
     };
