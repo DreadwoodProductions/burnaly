@@ -12,134 +12,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (sessionCookie) {
             const sessionData = JSON.parse(atob(sessionCookie));
-            updateUserInfo(sessionData);
-            await fetchAndDisplayServers(sessionData.accessToken);
-            setupEventListeners();
+            const guildData = await testServerFetch(sessionData.accessToken);
+            console.log('Guild Data:', guildData);
+            
+            // Display results on page if you want to see them
+            const resultsDiv = document.createElement('div');
+            resultsDiv.innerHTML = `
+                <h3>Test Results:</h3>
+                <p>Total Guilds: ${guildData.totalGuilds}</p>
+                <p>Manageable Guilds: ${guildData.managedGuilds}</p>
+            `;
+            document.body.appendChild(resultsDiv);
         }
     } catch (error) {
         console.error('Dashboard Error:', error);
     }
 });
 
-function updateUserInfo(sessionData) {
-    document.getElementById('username').textContent = sessionData.username;
-    document.getElementById('user-avatar').src = sessionData.avatar ? 
-        `https://cdn.discordapp.com/avatars/${sessionData.userId}/${sessionData.avatar}.png` :
-        '/images/default-avatar.png';
-}
-
-async function fetchAndDisplayServers(accessToken) {
-    // Log the token to verify it's correct
-    console.log('Fetching servers with token:', accessToken);
-    
-    const response = await fetch('https://discord.com/api/users/@me/guilds', {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    const guilds = await response.json();
-    console.log('Fetched guilds:', guilds);
-    
-    const serversList = document.getElementById('servers-list');
-    serversList.innerHTML = ''; // Clear existing content
-    
-    guilds.forEach(guild => {
-        const serverCard = createServerCard(guild);
-        serversList.appendChild(serverCard);
-    });
-    
-    // Update stats
-    document.getElementById('active-servers').textContent = guilds.length;
-}
-
-function createServerCard(guild) {
-    const serverCard = document.createElement('div');
-    serverCard.className = 'server-card';
-    serverCard.innerHTML = `
-        <div class="server-icon">
-            <img src="${guild.icon ? 
-                `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : 
-                '/images/default-server-icon.png'}" alt="${guild.name}">
-        </div>
-        <div class="server-info">
-            <h3>${guild.name}</h3>
-            <p class="member-count">Members: ${guild.approximate_member_count || '-'}</p>
-        </div>
-        <div class="server-actions">
-            <button onclick="manageServer('${guild.id}')" class="manage-btn">
-                <i class="fas fa-cog"></i> Manage
-            </button>
-        </div>
-    `;
-    return serverCard;
-}
-
-function setupEventListeners() {
-    // Logout button
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        document.cookie = 'discord_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        window.location.href = '/';
-    });
-
-    // Search functionality
-    const searchInput = document.querySelector('.search-bar input');
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const serverCards = document.querySelectorAll('.server-card');
-        
-        serverCards.forEach(card => {
-            const serverName = card.querySelector('h3').textContent.toLowerCase();
-            card.style.display = serverName.includes(searchTerm) ? 'flex' : 'none';
-        });
-    });
-
-    // Navigation links
-    document.querySelectorAll('.nav-links li').forEach(link => {
-        link.addEventListener('click', () => {
-            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-        });
-    });
-}
-
-function manageServer(guildId) {
-    window.location.href = `/server-management.html?id=${guildId}`;
-}
-
 async function testServerFetch(accessToken) {
     const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
         headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${accessToken}`
         }
     });
     
     const guilds = await guildsResponse.json();
     
-    // Send to test endpoint
+    // Filter for guilds where user has MANAGE_GUILD permission (0x20)
+    const managedGuilds = guilds.filter(guild => (guild.permissions & 0x20) === 0x20);
+    
     const testResponse = await fetch('/.netlify/functions/test-guilds', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ guilds })
+        body: JSON.stringify({ 
+            allGuilds: guilds,
+            managedGuilds: managedGuilds 
+        })
     });
     
-    const result = await testResponse.json();
-    console.log('Test endpoint response:', result);
-    
-    return guilds;
+    return await testResponse.json();
 }
-
-// Add smooth scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
