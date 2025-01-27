@@ -1,18 +1,10 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    console.log('Callback Function Started');
-    console.log('Query Parameters:', event.queryStringParameters);
-    console.log('Headers:', event.headers);
-    
     const code = event.queryStringParameters.code;
     const clientId = process.env.DISCORD_CLIENT_ID;
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
-    
-    console.log('Code:', code);
-    console.log('Client ID:', clientId);
-    console.log('Redirect URI:', redirectUri);
 
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
@@ -29,12 +21,18 @@ exports.handler = async (event) => {
     });
 
     const tokens = await tokenResponse.json();
-    console.log('Token Response:', tokens);
+    
+    // Set both tokens in separate cookies
+    const cookieHeaders = [
+        `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=${tokens.expires_in}`,
+        `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=${tokens.expires_in}`
+    ];
 
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax`,
+            'Set-Cookie': cookieHeaders,
+            'Cache-Control': 'no-cache',
             'Location': '/dashboard.html'
         }
     };
