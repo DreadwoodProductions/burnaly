@@ -5,8 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burnaly Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        #status-display {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .status-item {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
+    <div id="status-display">
+        <div class="status-item">Auth Status: <span id="auth-status">Checking...</span></div>
+        <div class="status-item">Code: <span id="auth-code">None</span></div>
+        <div class="status-item">Token: <span id="token-status">Checking...</span></div>
+        <div class="status-item">API Response: <span id="api-status">Waiting...</span></div>
+    </div>
+
     <nav class="dashboard-nav">
         <div class="user-profile">
             <img id="userAvatar" src="" alt="User Avatar">
@@ -14,13 +33,25 @@
         </div>
         <button onclick="dashboard.logout()">Logout</button>
     </nav>
+
     <div class="dashboard-container">
         <h1>Your Discord Servers</h1>
         <div id="servers-container"></div>
     </div>
-    <script src="/js/dashboard.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => dashboard.init());
+        function updateStatus(id, message) {
+            document.getElementById(id).textContent = message;
+        }
+        
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            updateStatus('auth-code', code || 'None');
+            updateStatus('auth-status', code ? 'Code Received' : 'No Code');
+            updateStatus('token-status', document.cookie.includes('discord_token') ? 'Present' : 'Missing');
+        }
     </script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>
