@@ -1,6 +1,8 @@
 const dashboard = {
     init: async function () {
         console.log('Dashboard initializing...');
+        console.log('Full cookie string:', document.cookie);
+        console.log('Current URL:', window.location.href);
         
         // Clear any OAuth2 code from URL
         if (window.location.search.includes('code')) {
@@ -12,6 +14,7 @@ const dashboard = {
             .find(row => row.startsWith('discord_token='))
             ?.split('=')[1];
 
+        console.log('Extracted token:', token);
         console.log('Token status:', token ? 'Found' : 'Not found');
 
         if (!token) {
