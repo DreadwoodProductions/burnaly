@@ -1,12 +1,34 @@
 const dashboard = {
+    refreshToken: async function () {
+        const refreshToken = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('discord_refresh_token='))
+            ?.split('=')[1];
+
+        if (!refreshToken) {
+            throw new Error('No refresh token found');
+        }
+
+        const response = await fetch('/.netlify/functions/refreshToken', {
+            headers: {
+                Authorization: `Bearer ${refreshToken}`
+            }
+        });
+
+        const tokens = await response.json();
+        document.cookie = `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+        document.cookie = `discord_refresh_token=${tokens.refresh_token}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+
+        return tokens.access_token;
+    },
+
     init: async function () {
-        // Remove the ?code parameter from URL first
+        console.log('Dashboard initializing...');
+        console.log('Cookies:', document.cookie);
+
         if (window.location.search.includes('code')) {
             window.history.replaceState({}, document.title, '/dashboard.html');
         }
-
-        console.log('Dashboard initializing...');
-        console.log('Cookies:', document.cookie);
 
         const token = document.cookie
             .split('; ')
@@ -16,20 +38,37 @@ const dashboard = {
         console.log('Token found:', token);
 
         if (!token) {
+            console.log('No token found, redirecting to auth...');
             window.location.href = '/.netlify/functions/auth';
             return;
         }
 
         try {
+            console.log('Loading user profile...');
             await this.loadUserProfile(token);
+            console.log('User profile loaded successfully');
+
+            console.log('Loading user servers...');
             await this.loadUserServers(token);
+            console.log('User servers loaded successfully');
         } catch (error) {
             console.error('Dashboard initialization failed:', error);
+            if (error.message.includes('401')) {
+                console.log('Token expired, attempting to refresh...');
+                try {
+                    const newToken = await this.refreshToken();
+                    console.log('Token refreshed successfully');
+                    await this.init();
+                } catch (refreshError) {
+                    console.error('Token refresh failed:', refreshError);
+                    window.location.href = '/.netlify/functions/auth';
+                }
+            }
         }
     },
 
     loadUserProfile: async function (token) {
-        const response = await fetch('https://discord.com/api/users/@me', {
+        const response = await fetch('/.netlify/functions/getUserProfile', {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -41,7 +80,7 @@ const dashboard = {
     },
 
     loadUserServers: async function (token) {
-        const response = await fetch('https://discord.com/api/users/@me/guilds', {
+        const response = await fetch('/.netlify/functions/getUserServers', {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -64,6 +103,7 @@ const dashboard = {
 
     logout: function () {
         document.cookie = 'discord_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'discord_refresh_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         window.location.href = '/';
     }
 };

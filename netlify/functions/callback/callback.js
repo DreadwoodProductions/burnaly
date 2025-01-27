@@ -6,8 +6,6 @@ exports.handler = async (event) => {
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
 
-    console.log('Starting token exchange...');
-
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
@@ -25,10 +23,14 @@ exports.handler = async (event) => {
     const tokens = await tokenResponse.json();
     console.log('Token received:', tokens);
 
+    const cookieOptions = 'Path=/; HttpOnly; Secure; SameSite=Lax';
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+            'Set-Cookie': [
+                `discord_token=${tokens.access_token}; ${cookieOptions}`,
+                `discord_refresh_token=${tokens.refresh_token}; ${cookieOptions}`
+            ],
             'Location': '/dashboard.html'
         }
     };
