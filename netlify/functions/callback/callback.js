@@ -21,10 +21,7 @@ exports.handler = async (event) => {
     });
 
     const tokens = await tokenResponse.json();
-    const cookieOptions = 'Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800';
-
-    // Combine both cookies into a single string
-    const cookieString = `discord_token=${tokens.access_token}; ${cookieOptions}, discord_refresh_token=${tokens.refresh_token}; ${cookieOptions}`;
+    const cookieString = `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`;
 
     return {
         statusCode: 302,
