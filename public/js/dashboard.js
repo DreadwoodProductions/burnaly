@@ -29,17 +29,18 @@ function updateUserInfo(sessionData) {
 }
 
 async function fetchAndDisplayServers(accessToken) {
+    // Log the token to verify it's correct
+    console.log('Fetching servers with token:', accessToken);
+    
     const response = await fetch('https://discord.com/api/users/@me/guilds', {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
         }
     });
     
     const guilds = await response.json();
-    
-    // Update stats
-    document.getElementById('active-servers').textContent = guilds.length;
-    let totalMembers = 0;
+    console.log('Fetched guilds:', guilds);
     
     const serversList = document.getElementById('servers-list');
     serversList.innerHTML = ''; // Clear existing content
@@ -47,12 +48,10 @@ async function fetchAndDisplayServers(accessToken) {
     guilds.forEach(guild => {
         const serverCard = createServerCard(guild);
         serversList.appendChild(serverCard);
-        if (guild.approximate_member_count) {
-            totalMembers += guild.approximate_member_count;
-        }
     });
     
-    document.getElementById('total-members').textContent = totalMembers || '-';
+    // Update stats
+    document.getElementById('active-servers').textContent = guilds.length;
 }
 
 function createServerCard(guild) {
