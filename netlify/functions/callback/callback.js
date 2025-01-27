@@ -20,7 +20,6 @@ exports.handler = async (event) => {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
     });
-
     const tokens = await tokenResponse.json();
 
     // Get user data immediately to verify token
@@ -29,19 +28,18 @@ exports.handler = async (event) => {
             Authorization: `Bearer ${tokens.access_token}`
         }
     });
-
     const userData = await userResponse.json();
 
-    // Set both tokens as cookies
-    const cookieStrings = [
+    // Combine cookies into a single string separated by semicolons
+    const cookieString = [
         `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`,
         `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`
-    ];
+    ].join(', ');
 
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': cookieStrings,
+            'Set-Cookie': cookieString,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
             'Expires': '0',
