@@ -27,10 +27,7 @@ exports.handler = async (event) => {
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': [
-                `discord_token=${tokens.access_token}; ${cookieOptions}`,
-                `discord_refresh_token=${tokens.refresh_token}; ${cookieOptions}`
-            ],
+            'Set-Cookie': `discord_token=${tokens.access_token}; ${cookieOptions}, discord_refresh_token=${tokens.refresh_token}; ${cookieOptions}`,
             'Location': '/dashboard.html'
         }
     };
