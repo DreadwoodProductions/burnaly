@@ -4,54 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burnaly Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        #status-display {
-            background: #f0f0f0;
-            padding: 15px;
-            margin: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-        }
-        .status-item {
-            margin: 5px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/dashboard.css">
 </head>
 <body>
-    <div id="status-display">
-        <div class="status-item">Auth Status: <span id="auth-status">Checking...</span></div>
-        <div class="status-item">Code: <span id="auth-code">None</span></div>
-        <div class="status-item">Token: <span id="token-status">Checking...</span></div>
-        <div class="status-item">API Response: <span id="api-status">Waiting...</span></div>
-    </div>
-
-    <nav class="dashboard-nav">
-        <div class="user-profile">
-            <img id="userAvatar" src="" alt="User Avatar">
-            <span id="userName"></span>
-        </div>
-        <button onclick="dashboard.logout()">Logout</button>
-    </nav>
-
-    <div class="dashboard-container">
-        <h1>Your Discord Servers</h1>
-        <div id="servers-container"></div>
+    <div id="dashboard-container">
+        <header>
+            <div class="user-info">
+                <img id="user-avatar" src="" alt="User Avatar">
+                <span id="username"></span>
+            </div>
+            <nav>
+                <button id="logout-btn">Logout</button>
+            </nav>
+        </header>
+        
+        <main>
+            <div id="servers-list"></div>
+        </main>
     </div>
 
     <script>
-        function updateStatus(id, message) {
-            document.getElementById(id).textContent = message;
-        }
-        
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            updateStatus('auth-code', code || 'None');
-            updateStatus('auth-status', code ? 'Code Received' : 'No Code');
-            updateStatus('token-status', document.cookie.includes('discord_token') ? 'Present' : 'Missing');
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (!document.cookie.includes('discord_token')) {
+                window.location.href = '/.netlify/functions/auth';
+                return;
+            }
+
+            try {
+                // Get session data
+                const sessionCookie = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('session='))
+                    ?.split('=')[1];
+
+                if (sessionCookie) {
+                    const sessionData = JSON.parse(atob(sessionCookie));
+                    
+                    // Update UI with user info
+                    document.getElementById('username').textContent = sessionData.username;
+                    document.getElementById('user-avatar').src = 
+                        sessionData.avatar ? 
+                        `https://cdn.discordapp.com/avatars/${sessionData.userId}/${sessionData.avatar}.png` :
+                        'default-avatar.png';
+
+                    // Display servers
+                    const serversList = document.getElementById('servers-list');
+                    sessionData.guilds.forEach(guild => {
+                        const serverCard = document.createElement('div');
+                        serverCard.className = 'server-card';
+                        serverCard.innerHTML = `
+                            <h3>${guild.name}</h3>
+                            <img src="${guild.icon ? 
+                                `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : 
+                                'default-server-icon.png'}" alt="${guild.name}">
+                            <button onclick="manageServer('${guild.id}')">Manage</button>
+                        `;
+                        serversList.appendChild(serverCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Dashboard Error:', error);
+            }
+        });
+
+        // Logout function
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            document.cookie = 'discord_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/';
+        });
+
+        function manageServer(guildId) {
+            window.location.href = `/server-management.html?id=${guildId}`;
         }
     </script>
-    <script src="/js/dashboard.js"></script>
 </body>
 </html>
