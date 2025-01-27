@@ -109,6 +109,31 @@ function manageServer(guildId) {
     window.location.href = `/server-management.html?id=${guildId}`;
 }
 
+async function testServerFetch(accessToken) {
+    const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    const guilds = await guildsResponse.json();
+    
+    // Send to test endpoint
+    const testResponse = await fetch('/.netlify/functions/test-guilds', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ guilds })
+    });
+    
+    const result = await testResponse.json();
+    console.log('Test endpoint response:', result);
+    
+    return guilds;
+}
+
 // Add smooth scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
