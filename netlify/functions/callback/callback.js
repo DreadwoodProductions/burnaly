@@ -21,19 +21,28 @@ exports.handler = async (event) => {
     });
 
     const tokens = await tokenResponse.json();
-    
-    // Combine multiple cookies into a single string with comma separation
-    const cookieString = [
-        `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax`,
-        `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax`
-    ].join(', ');
+
+    // Get user data
+    const userResponse = await fetch('https://discord.com/api/users/@me', {
+        headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+        },
+    });
+    const userData = await userResponse.json();
+
+    // Create session data
+    const sessionData = {
+        userId: userData.id,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token
+    };
 
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': cookieString,
+            'Set-Cookie': `session=${Buffer.from(JSON.stringify(sessionData)).toString('base64')}; Path=/; Secure; HttpOnly; SameSite=Lax`,
             'Cache-Control': 'no-cache',
-            'Location': '/dashboard.html'
+            'Location': '/dashboard'
         }
     };
 };
