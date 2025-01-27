@@ -14,10 +14,10 @@ const dashboard = {
                 Authorization: `Bearer ${refreshToken}`
             }
         });
-
         const tokens = await response.json();
-        document.cookie = `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`;
-        document.cookie = `discord_refresh_token=${tokens.refresh_token}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+
+        document.cookie = `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`;
+        document.cookie = `discord_refresh_token=${tokens.refresh_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`;
 
         return tokens.access_token;
     },
@@ -35,10 +35,10 @@ const dashboard = {
             .find(row => row.startsWith('discord_token='))
             ?.split('=')[1];
 
-        console.log('Token found:', token);
+        console.log('Token status:', token ? 'Found' : 'Not found');
 
         if (!token) {
-            console.log('No token found, redirecting to auth...');
+            console.log('Redirecting to auth...');
             window.location.href = '/.netlify/functions/auth';
             return;
         }
@@ -46,18 +46,13 @@ const dashboard = {
         try {
             console.log('Loading user profile...');
             await this.loadUserProfile(token);
-            console.log('User profile loaded successfully');
-
             console.log('Loading user servers...');
             await this.loadUserServers(token);
-            console.log('User servers loaded successfully');
         } catch (error) {
-            console.error('Dashboard initialization failed:', error);
+            console.error('Error:', error);
             if (error.message.includes('401')) {
-                console.log('Token expired, attempting to refresh...');
                 try {
                     const newToken = await this.refreshToken();
-                    console.log('Token refreshed successfully');
                     await this.init();
                 } catch (refreshError) {
                     console.error('Token refresh failed:', refreshError);
@@ -74,7 +69,6 @@ const dashboard = {
             }
         });
         const user = await response.json();
-
         document.getElementById('userName').textContent = user.username;
         document.getElementById('userAvatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
     },
@@ -86,7 +80,6 @@ const dashboard = {
             }
         });
         const servers = await response.json();
-
         const container = document.getElementById('servers-container');
         container.innerHTML = servers.map(server => `
             <div class="server-card">
