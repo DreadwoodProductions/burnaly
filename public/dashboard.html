@@ -66,14 +66,14 @@
                         <i class="fas fa-users"></i>
                         <div class="stat-info">
                             <h3>Total Members</h3>
-                            <span class="stat-number">12,345</span>
+                            <span class="stat-number" id="total-members">-</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-server"></i>
                         <div class="stat-info">
                             <h3>Active Servers</h3>
-                            <span class="stat-number">24</span>
+                            <span class="stat-number" id="active-servers">-</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -92,66 +92,6 @@
             </div>
         </main>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (!document.cookie.includes('discord_token')) {
-                window.location.href = '/.netlify/functions/auth';
-                return;
-            }
-
-            try {
-                const sessionCookie = document.cookie
-                    .split('; ')
-                    .find(row => row.startsWith('session='))
-                    ?.split('=')[1];
-
-                if (sessionCookie) {
-                    const sessionData = JSON.parse(atob(sessionCookie));
-                    
-                    document.getElementById('username').textContent = sessionData.username;
-                    document.getElementById('user-avatar').src = 
-                        sessionData.avatar ? 
-                        `https://cdn.discordapp.com/avatars/${sessionData.userId}/${sessionData.avatar}.png` :
-                        '/images/default-avatar.png';
-
-                    const serversList = document.getElementById('servers-list');
-                    sessionData.guilds.forEach(guild => {
-                        const serverCard = document.createElement('div');
-                        serverCard.className = 'server-card';
-                        serverCard.innerHTML = `
-                            <div class="server-icon">
-                                <img src="${guild.icon ? 
-                                    `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : 
-                                    '/images/default-server-icon.png'}" alt="${guild.name}">
-                            </div>
-                            <div class="server-info">
-                                <h3>${guild.name}</h3>
-                                <p class="member-count">Members: ${guild.approximate_member_count || '---'}</p>
-                            </div>
-                            <div class="server-actions">
-                                <button onclick="manageServer('${guild.id}')" class="manage-btn">
-                                    <i class="fas fa-cog"></i> Manage
-                                </button>
-                            </div>
-                        `;
-                        serversList.appendChild(serverCard);
-                    });
-                }
-            } catch (error) {
-                console.error('Dashboard Error:', error);
-            }
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            document.cookie = 'discord_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            window.location.href = '/';
-        });
-
-        function manageServer(guildId) {
-            window.location.href = `/server-management.html?id=${guildId}`;
-        }
-    </script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>
