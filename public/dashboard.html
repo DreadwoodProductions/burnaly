@@ -1,33 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burnaly Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="dashboard-wrapper" id="app">
-        <nav class="sidebar">
-            <div class="user-profile">
-                <img src="" alt="Profile" id="userAvatar">
-                <span id="userName">Loading...</span>
-            </div>
-            <ul class="nav-links">
-                <li class="active">Overview</li>
-                <li>Servers</li>
-                <li>Scripts</li>
-                <li>Settings</li>
-            </ul>
-            <button class="logout-btn" onclick="dashboard.logout()">Logout</button>
-        </nav>
-        <main class="dashboard-content">
-            <div class="servers-grid" id="servers-container">
-                Loading servers...
-            </div>
-        </main>
+    <div class="dashboard-container">
+        <div class="user-profile">
+            <img id="userAvatar" src="" alt="User Avatar">
+            <h2 id="userName"></h2>
+        </div>
+        <div id="servers-container"></div>
     </div>
     <script src="/js/dashboard.js"></script>
 </body>
+
 </html>
