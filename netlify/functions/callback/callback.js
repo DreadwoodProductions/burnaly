@@ -1,32 +1,32 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export const handler = async (event) => {
-  const code = event.queryStringParameters.code;
-  const clientId = process.env.DISCORD_CLIENT_ID;
-  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
-  const redirectUri = process.env.REDIRECT_URI;
+exports.handler = async (event) => {
+    const code = event.queryStringParameters.code;
+    const clientId = process.env.DISCORD_CLIENT_ID;
+    const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+    const redirectUri = process.env.REDIRECT_URI;
 
-  const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-    method: 'POST',
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-      grant_type: 'authorization_code',
-      redirect_uri: redirectUri,
-    }),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
+    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            code,
+            grant_type: 'authorization_code',
+            redirect_uri: redirectUri,
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
 
-  const tokens = await tokenResponse.json();
+    const tokens = await tokenResponse.json();
 
-  return {
-    statusCode: 302,
-    headers: {
-      'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-      Location: '/dashboard.html',
-    },
-  };
+    return {
+        statusCode: 302,
+        headers: {
+            'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+            Location: '/dashboard.html',
+        },
+    };
 };
