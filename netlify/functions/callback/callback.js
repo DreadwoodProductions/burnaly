@@ -6,43 +6,68 @@ exports.handler = async (event) => {
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
 
-    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-        method: 'POST',
-        body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            code,
-            grant_type: 'authorization_code',
-            redirect_uri: redirectUri,
-        }),
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    });
+    try {
+        // Exchange code for tokens
+        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            body: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                code,
+                grant_type: 'authorization_code',
+                redirect_uri: redirectUri,
+            }),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
 
-    const tokens = await tokenResponse.json();
+        const tokens = await tokenResponse.json();
 
-    // Get user data
-    const userResponse = await fetch('https://discord.com/api/users/@me', {
-        headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-        },
-    });
-    const userData = await userResponse.json();
+        // Get user data
+        const userResponse = await fetch('https://discord.com/api/users/@me', {
+            headers: {
+                Authorization: `Bearer ${tokens.access_token}`,
+            },
+        });
+        const userData = await userResponse.json();
 
-    // Create session data
-    const sessionData = {
-        userId: userData.id,
-        accessToken: tokens.access_token,
-        refreshToken: tokens.refresh_token
-    };
+        // Get user's guilds
+        const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
+            headers: {
+                Authorization: `Bearer ${tokens.access_token}`,
+            },
+        });
+        const guildsData = await guildsResponse.json();
 
-    return {
-        statusCode: 302,
-        headers: {
-            'Set-Cookie': `session=${Buffer.from(JSON.stringify(sessionData)).toString('base64')}; Path=/; Secure; HttpOnly; SameSite=Lax`,
-            'Cache-Control': 'no-cache',
-            'Location': '/dashboard'
-        }
-    };
+        // Create session data
+        const sessionData = {
+            userId: userData.id,
+            username: userData.username,
+            avatar: userData.avatar,
+            guilds: guildsData,
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token
+        };
+
+        return {
+            statusCode: 302,
+            headers: {
+                'Set-Cookie': [
+                    `session=${Buffer.from(JSON.stringify(sessionData)).toString('base64')}; Path=/; Secure; HttpOnly; SameSite=Lax`,
+                    `discord_token=${tokens.access_token}; Path=/; Secure; HttpOnly; SameSite=Lax`
+                ],
+                'Cache-Control': 'no-cache',
+                'Location': '/dashboard.html'
+            }
+        };
+    } catch (error) {
+        console.error('Auth Error:', error);
+        return {
+            statusCode: 302,
+            headers: {
+                'Location': '/?error=auth_failed'
+            }
+        };
+    }
 };
