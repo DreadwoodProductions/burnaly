@@ -26,7 +26,7 @@ exports.handler = async (event) => {
         statusCode: 302,
         headers: {
             'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-            Location: '/dashboard.html',
-        },
+            Location: '/dashboard.html'
+        }
     };
 };
