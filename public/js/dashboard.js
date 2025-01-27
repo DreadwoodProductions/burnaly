@@ -102,8 +102,8 @@ const dashboard = {
         }
 
         const tokens = await response.json();
-        document.cookie = `discord_token=${tokens.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`;
-        document.cookie = `discord_refresh_token=${tokens.refresh_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`;
+        document.cookie = `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`;
+        document.cookie = `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`;
 
         return tokens.access_token;
     },
@@ -119,5 +119,3 @@ const dashboard = {
         window.location.href = '/';
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => dashboard.init());
