@@ -1,7 +1,7 @@
 export const handler = async () => {
     const clientId = process.env.DISCORD_CLIENT_ID;
     const redirectUri = process.env.REDIRECT_URI;
-    const scope = 'identify guilds';
+    const scope = 'identify guilds guilds.members.read';
 
     return {
         statusCode: 302,
