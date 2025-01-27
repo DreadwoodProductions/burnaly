@@ -7,7 +7,6 @@ exports.handler = async (event) => {
     const redirectUri = process.env.REDIRECT_URI;
 
     try {
-        // Exchange code for tokens
         const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
             method: 'POST',
             body: new URLSearchParams({
@@ -23,40 +22,19 @@ exports.handler = async (event) => {
         });
 
         const tokens = await tokenResponse.json();
+        const userData = await getUserData(tokens.access_token);
+        const sessionData = Buffer.from(JSON.stringify(userData)).toString('base64');
 
-        // Get user data
-        const userResponse = await fetch('https://discord.com/api/users/@me', {
-            headers: {
-                Authorization: `Bearer ${tokens.access_token}`,
-            },
-        });
-        const userData = await userResponse.json();
-
-        // Get user's guilds
-        const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
-            headers: {
-                Authorization: `Bearer ${tokens.access_token}`,
-            },
-        });
-        const guildsData = await guildsResponse.json();
-
-        // Create session data
-        const sessionData = {
-            userId: userData.id,
-            username: userData.username,
-            avatar: userData.avatar,
-            guilds: guildsData,
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token
-        };
+        // Combine multiple cookies into a single string
+        const cookieString = [
+            `session=${sessionData}; Path=/; Secure; HttpOnly; SameSite=Lax`,
+            `discord_token=${tokens.access_token}; Path=/; Secure; HttpOnly; SameSite=Lax`
+        ].join(', ');
 
         return {
             statusCode: 302,
             headers: {
-                'Set-Cookie': [
-                    `session=${Buffer.from(JSON.stringify(sessionData)).toString('base64')}; Path=/; Secure; HttpOnly; SameSite=Lax`,
-                    `discord_token=${tokens.access_token}; Path=/; Secure; HttpOnly; SameSite=Lax`
-                ],
+                'Set-Cookie': cookieString,
                 'Cache-Control': 'no-cache',
                 'Location': '/dashboard.html'
             }
@@ -71,3 +49,24 @@ exports.handler = async (event) => {
         };
     }
 };
+
+async function getUserData(token) {
+    const [userResponse, guildsResponse] = await Promise.all([
+        fetch('https://discord.com/api/users/@me', {
+            headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch('https://discord.com/api/users/@me/guilds', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+    ]);
+
+    const userData = await userResponse.json();
+    const guildsData = await guildsResponse.json();
+
+    return {
+        userId: userData.id,
+        username: userData.username,
+        avatar: userData.avatar,
+        guilds: guildsData
+    };
+}
