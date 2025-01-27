@@ -1,9 +1,12 @@
 const dashboard = {
     init: async function () {
+        console.log('Cookies:', document.cookie);
         const token = document.cookie
             .split('; ')
             .find(row => row.startsWith('discord_token='))
             ?.split('=')[1];
+
+        console.log('Token found:', token);
 
         if (!token) {
             window.location.href = '/.netlify/functions/auth';
@@ -45,7 +48,6 @@ const dashboard = {
     },
 
     configureServer: function (serverId) {
-        // Server configuration logic will go here
         console.log(`Configuring server: ${serverId}`);
     },
 
