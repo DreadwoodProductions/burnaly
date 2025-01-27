@@ -22,16 +22,16 @@ exports.handler = async (event) => {
 
     const tokens = await tokenResponse.json();
     
-    // Set both tokens in separate cookies
-    const cookieHeaders = [
-        `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=${tokens.expires_in}`,
-        `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=${tokens.expires_in}`
-    ];
+    // Combine multiple cookies into a single string with comma separation
+    const cookieString = [
+        `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax`,
+        `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax`
+    ].join(', ');
 
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': cookieHeaders,
+            'Set-Cookie': cookieString,
             'Cache-Control': 'no-cache',
             'Location': '/dashboard.html'
         }
