@@ -6,6 +6,7 @@ exports.handler = async (event) => {
     const clientSecret = process.env.DISCORD_CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
 
+    // Exchange code for token
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
         body: new URLSearchParams({
@@ -22,16 +23,19 @@ exports.handler = async (event) => {
 
     const tokens = await tokenResponse.json();
 
-    const cookieString = [
-        `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`,
-        `discord_refresh_token=${tokens.refresh_token}; Path=/; Secure; SameSite=Lax; Max-Age=604800`
-    ].join(', ');
+    // Get user data
+    const userResponse = await fetch('https://discord.com/api/users/@me', {
+        headers: {
+            Authorization: `Bearer ${tokens.access_token}`
+        }
+    });
+    const userData = await userResponse.json();
 
+    // Set token in cookie and redirect to dashboard
     return {
         statusCode: 302,
         headers: {
-            'Set-Cookie': cookieString,
-            'Cache-Control': 'no-cache',
+            'Set-Cookie': `discord_token=${tokens.access_token}; Path=/; Secure; SameSite=Lax`,
             'Location': '/dashboard.html'
         }
     };
