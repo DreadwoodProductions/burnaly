@@ -3,21 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burnaly - Discord Bot Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Burnaly - Discord Bot Management</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <img src="/images/logo.png" alt="Burnaly" class="login-logo">
-            <h1>Welcome to Burnaly</h1>
-            <p>Manage your Discord servers with ease</p>
-            <a href="/.netlify/functions/auth" class="discord-login">
-                <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_white_RGB.png" alt="Discord">
-                Login with Discord
-            </a>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <img src="/images/logo.png" alt="Burnaly Logo">
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="nav-auth">
+                <button class="login-btn" onclick="window.location.href='/.netlify/functions/auth'">
+                    <i class="fab fa-discord"></i> Login with Discord
+                </button>
+            </div>
         </div>
-    </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="animate-text">Manage Your Discord Servers Like Never Before</h1>
+            <p class="hero-subtitle">Powerful tools, beautiful analytics, and seamless integration</p>
+            <div class="hero-cta">
+                <button class="primary-btn pulse" onclick="window.location.href='/.netlify/functions/auth'">
+                    Get Started
+                </button>
+                <button class="secondary-btn">
+                    Watch Demo
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="50000">0</span>
+                    <span class="stat-label">Active Users</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="100000">0</span>
+                    <span class="stat-label">Servers Managed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="99">0</span>
+                    <span class="stat-label">Uptime %</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2>Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Advanced Analytics</h3>
+                <p>Track your server's growth with detailed insights and metrics</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Auto Moderation</h3>
+                <p>Keep your community safe with intelligent moderation tools</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-users"></i>
+                <h3>User Management</h3>
+                <p>Efficiently manage roles and permissions across servers</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Custom Commands</h3>
+                <p>Create and manage custom commands with ease</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <h2>Choose Your Plan</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="price-header">
+                    <h3>Basic</h3>
+                    <div class="price">Free</div>
+                </div>
+                <ul class="price-features">
+                    <li><i class="fas fa-check"></i> Basic Analytics</li>
+                    <li><i class="fas fa-check"></i> Up to 3 Servers</li>
+                    <li><i class="fas fa-check"></i> Standard Support</li>
+                </ul>
+                <button class="price-btn">Get Started</button>
+            </div>
+            <div class="price-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="price-header">
+                    <h3>Pro</h3>
+                    <div class="price">$9.99<span>/month</span></div>
+                </div>
+                <ul class="price-features">
+                    <li><i class="fas fa-check"></i> Advanced Analytics</li>
+                    <li><i class="fas fa-check"></i> Unlimited Servers</li>
+                    <li><i class="fas fa-check"></i> Priority Support</li>
+                    <li><i class="fas fa-check"></i> Custom Commands</li>
+                </ul>
+                <button class="price-btn">Choose Pro</button>
+            </div>
+            <div class="price-card">
+                <div class="price-header">
+                    <h3>Enterprise</h3>
+                    <div class="price">Contact Us</div>
+                </div>
+                <ul class="price-features">
+                    <li><i class="fas fa-check"></i> Custom Solutions</li>
+                    <li><i class="fas fa-check"></i> Dedicated Support</li>
+                    <li><i class="fas fa-check"></i> API Access</li>
+                </ul>
+                <button class="price-btn">Contact Sales</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <h2>What Users Say</h2>
+        <div class="testimonials-slider">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Burnaly transformed how we manage our Discord community. The analytics are incredible!"</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="/images/testimonial1.jpg" alt="User">
+                    <div class="author-info">
+                        <h4>Sarah Johnson</h4>
+                        <p>Community Manager</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more testimonial cards -->
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I get started?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Simply click the "Login with Discord" button and authorize Burnaly to access your servers. It's that easy!</p>
+                </div>
+            </div>
+            <!-- Add more FAQ items -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="/images/logo.png" alt="Burnaly Logo" class="footer-logo">
+                <p>Making Discord server management easier than ever.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#testimonials">Testimonials</a>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Burnaly. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="/scripts/main.js"></script>
 </body>
 </html>
