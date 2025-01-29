@@ -79,16 +79,22 @@ body {
 .login-btn {
     height: 50px;
     width: 200px;
-  color: #ffff;
-  size: 1rem;
+    color: #ffff;
+    font-size: 1rem;
+    background-color: #007bff; /* Example background color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.login-btn i{
-  color: #000;
+.login-btn i {
+    color: #000;
 }
 
-.login-btn :hover {
+.login-btn:hover {
     color: var(--accent);
+    background-color: #0056b3;
 }
 
 /* Hero Section */
