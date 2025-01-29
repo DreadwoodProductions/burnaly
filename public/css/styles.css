@@ -8,7 +8,6 @@ body {
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -18,17 +17,26 @@ body {
 /* Navigation Styles */
 .nav-container {
     position: fixed;
+    height: 10%;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 1000;
+    overflow: hidden; /* Prevents content from spilling out */
 }
 
 .nav-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
+    padding: 0 50px; /* Adjusted padding for better alignment */
+}
+
+.nav-content img {
+    max-height: 50%; /* Ensures the image fits within the container */
+    max-width: 50%; /* Ensures the image does not overflow */
+    height: auto; /* Maintains aspect ratio */
+    width: auto; /* Maintains aspect ratio */
 }
 
 .nav-links a {
@@ -42,9 +50,10 @@ body {
     background-color: #7289da;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 20px 20px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 15px;
 }
 
 /* Hero Section Styles */
@@ -329,11 +338,11 @@ body {
 .popular-badge {
     background: #4CAF50;
     color: white;
-    padding: 5px 10px;
+    padding: 10px 20px;
     border-radius: 5px;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: -20px;
+    left: 80px;
 }
 
 
@@ -413,10 +422,11 @@ body {
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 .footer-logo {
+    display: flex;
     width: 100px;
 }
 
