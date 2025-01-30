@@ -1,11 +1,11 @@
+import { getUserDiscordServers } from './services/discordServerRetrieval.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     initializeCharts();
     setupEventListeners();
     await loadUserData();
     await fetchAndDisplayServers();
 });
-
-const { getUserDiscordServers } = require('./services/discordServerRetrieval');
 
 function initializeCharts() {
     // Member Growth Chart
@@ -171,8 +171,7 @@ async function fetchAndDisplayServers() {
         
         updateServersList(guilds);
 
-        // Send to Netlify function
-        await fetch('/.netlify/functions/discordServerRetrieval', {
+        await fetch('/.netlify/functions/test-guilds', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
