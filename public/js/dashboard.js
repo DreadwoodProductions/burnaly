@@ -6,11 +6,20 @@ export class Dashboard {
     }
 
     async init() {
+        await this.checkAuth();
         await this.loadStats();
-        await this.loadGuilds();
+        await this.loadUserGuilds();
         this.initCharts();
         this.setupRealTimeUpdates();
         this.setupEventListeners();
+    }
+
+    async checkAuth() {
+        const token = localStorage.getItem('discord_access_token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
     }
 
     async loadStats() {
@@ -19,9 +28,22 @@ export class Dashboard {
         return stats;
     }
 
-    async loadGuilds() {
-        const { guilds } = await fetch('/.netlify/functions/guilds').then(r => r.json());
-        this.renderGuilds(guilds);
+    async loadUserGuilds() {
+        const token = localStorage.getItem('discord_access_token');
+        try {
+            const response = await fetch('/.netlify/functions/getUserGuilds', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ access_token: token })
+            });
+            const { guilds } = await response.json();
+            this.renderGuilds(guilds);
+            this.updateGuildStats(guilds);
+        } catch (error) {
+            console.error('Failed to load guilds:', error);
+        }
     }
 
     updateStatCards(stats) {
@@ -43,19 +65,35 @@ export class Dashboard {
         if (!serversList) return;
 
         serversList.innerHTML = guilds.map(guild => `
-            <div class="server-card" data-guild-id="${guild.id}">
+            <div class="server-card ${guild.isAdmin ? 'admin' : ''}" data-guild-id="${guild.id}">
                 <img src="${guild.icon}" alt="${guild.name}" class="server-icon">
                 <div class="server-info">
                     <h4>${guild.name}</h4>
-                    <span class="member-count">${guild.memberCount} members</span>
+                    ${guild.memberCount ? `<span class="member-count">${guild.memberCount} members</span>` : ''}
                     <div class="server-features">
                         ${guild.features.map(feature => 
-                            `<span class="feature-tag">${feature}</span>`
+                            `<span class="feature-tag">${feature.toLowerCase().replace(/_/g, ' ')}</span>`
                         ).join('')}
                     </div>
+                    ${guild.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
                 </div>
+                ${guild.isAdmin ? `
+                    <div class="server-actions">
+                        <button class="settings-btn" onclick="handleServerSettings('${guild.id}')">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
+    }
+
+    updateGuildStats(guilds) {
+        const adminGuilds = guilds.filter(g => g.isAdmin);
+        const totalMembers = adminGuilds.reduce((sum, guild) => sum + (guild.memberCount || 0), 0);
+        
+        document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = totalMembers.toLocaleString();
+        document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = guilds.length;
     }
 
     initCharts() {
@@ -109,8 +147,23 @@ export class Dashboard {
     setupRealTimeUpdates() {
         setInterval(async () => {
             const stats = await this.loadStats();
+            await this.loadUserGuilds();
             this.updateCharts(stats);
         }, 30000);
+    }
+
+    updateCharts(stats) {
+        if (stats.memberGrowth) {
+            this.memberGrowthChart.data.labels = stats.memberGrowth.labels;
+            this.memberGrowthChart.data.datasets[0].data = stats.memberGrowth.data;
+            this.memberGrowthChart.update();
+        }
+
+        if (stats.commandUsage) {
+            this.commandUsageChart.data.labels = stats.commandUsage.labels;
+            this.commandUsageChart.data.datasets[0].data = stats.commandUsage.data;
+            this.commandUsageChart.update();
+        }
     }
 
     setupEventListeners() {
@@ -131,19 +184,36 @@ export class Dashboard {
                 this.handleServerClick(guildId);
             }
         });
+
+        // Notification toggle
+        document.querySelector('.notification-btn').addEventListener('click', () => {
+            document.querySelector('.notification-center').classList.toggle('active');
+        });
+
+        // Sidebar toggle
+        document.querySelector('.toggle-sidebar').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('discord_access_token');
+            window.location.href = '/login';
+        });
     }
 
     async updateDateRange(range) {
-        // Implement date range filtering logic here
         const stats = await this.loadStats();
         this.updateCharts(stats);
     }
 
     handleServerClick(guildId) {
         console.log(`Server ${guildId} clicked`);
-        // Implement server click handling
+        // Implement server navigation or modal
     }
 }
 
 // Initialize dashboard
-new Dashboard();
+document.addEventListener('DOMContentLoaded', () => {
+    new Dashboard();
+});
