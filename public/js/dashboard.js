@@ -1,3 +1,5 @@
+# JavaScript Code for Dashboard Initialization
+
 document.addEventListener('DOMContentLoaded', async () => {
     initializeCharts();
     setupEventListeners();
@@ -170,7 +172,7 @@ async function testServerFetch() {
             
             const guilds = await guildsResponse.json();
             
-            const testResponse = await fetch('/.netlify/functions/test-guilds', {
+            const testResponse = await fetch('/.netlify/functions/getUserServers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
