@@ -1,8 +1,16 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    const { code } = JSON.parse(event.body);
+    // Handle the code directly from query parameters
+    const code = event.queryStringParameters?.code;
     
+    if (!code) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'No code provided' })
+        };
+    }
+
     const params = new URLSearchParams({
         client_id: process.env.DISCORD_CLIENT_ID,
         client_secret: process.env.DISCORD_CLIENT_SECRET,
@@ -25,7 +33,8 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify(data)
         };
