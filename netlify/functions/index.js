@@ -1,10 +1,26 @@
-// Add this function to handle guild requests
-export const fetchTestGuilds = async () => {
-  const response = await fetch('/test-guilds', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-  return response.json();
-};
+exports.handler = async (event, context) => {
+  // Handle different HTTP methods
+  switch (event.httpMethod) {
+    case 'GET':
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: 'online',
+          version: '1.0.0',
+          endpoints: [
+            '/guilds',
+            '/users',
+            '/status'
+          ]
+        })
+      }
+    default:
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ message: 'Method not allowed' })
+      }
+  }
+}
