@@ -1,11 +1,11 @@
-# JavaScript Code for Dashboard Initialization
-
 document.addEventListener('DOMContentLoaded', async () => {
     initializeCharts();
     setupEventListeners();
     await loadUserData();
-    await testServerFetch();
+    await fetchAndDisplayServers();
 });
+
+const { getUserDiscordServers } = require('./services/discordServerRetrieval');
 
 function initializeCharts() {
     // Member Growth Chart
@@ -94,7 +94,7 @@ function setupEventListeners() {
     const toggleBtn = document.querySelector('.toggle-sidebar');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
-
+    
     toggleBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         mainContent.style.marginLeft = sidebar.classList.contains('collapsed') ? 
@@ -104,7 +104,7 @@ function setupEventListeners() {
     // Notification Center Toggle
     const notificationBtn = document.querySelector('.notification-btn');
     const notificationCenter = document.querySelector('.notification-center');
-
+    
     notificationBtn.addEventListener('click', () => {
         notificationCenter.classList.toggle('active');
     });
@@ -155,38 +155,40 @@ async function loadUserData() {
     }
 }
 
-async function testServerFetch() {
+async function fetchAndDisplayServers() {
     try {
         const sessionCookie = document.cookie
             .split('; ')
             .find(row => row.startsWith('session='))
             ?.split('=')[1];
 
-        if (sessionCookie) {
-            const sessionData = JSON.parse(atob(sessionCookie));
-            const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
-                headers: {
-                    'Authorization': `Bearer ${sessionData.accessToken}`
-                }
-            });
-            
-            const guilds = await guildsResponse.json();
-            
-            const testResponse = await fetch('/.netlify/functions/getUserServers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ guilds })
-            });
-            
-            const result = await testResponse.json();
-            console.log('Server test results:', result);
-            
-            updateServersList(guilds);
+        if (!sessionCookie) {
+            throw new Error('No session found');
         }
+
+        const sessionData = JSON.parse(atob(sessionCookie));
+        const guilds = await getUserDiscordServers(sessionData.accessToken);
+        
+        updateServersList(guilds);
+
+        // Send to Netlify function
+        await fetch('/.netlify/functions/discordServerRetrieval', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ guilds })
+        });
+
     } catch (error) {
-        console.error('Error fetching servers:', error);
+        console.error('Failed to fetch servers:', error);
+        const serversList = document.getElementById('servers-list');
+        serversList.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Unable to load servers. Please try refreshing the page.</p>
+            </div>
+        `;
     }
 }
 
@@ -216,7 +218,5 @@ function updateServersList(guilds) {
 }
 
 function updateChartData(timeframe) {
-    // Update chart data based on selected timeframe
-    // This would typically fetch new data from your backend
     console.log(`Updating charts for timeframe: ${timeframe}`);
 }
