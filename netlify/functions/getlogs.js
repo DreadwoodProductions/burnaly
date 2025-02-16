@@ -3,17 +3,31 @@ const { getStore } = require('@netlify/blobs');
 exports.handler = async (event, context) => {
   try {
     const store = getStore({
-      name: "errors",
+      name: "roblox-errors",
       siteID: process.env.NETLIFY_SITE_ID,
       token: process.env.NETLIFY_AUTH_TOKEN
     });
     
-    const { blobs } = await store.list();
+    // Get date from query parameter
+    const dateParam = event.queryStringParameters?.date;
     const logs = [];
     
-    for (const blob of blobs) {
-      const data = await store.get(blob.key, { type: 'json' });
-      logs.push(data);
+    if (dateParam) {
+      // Parse date in MM/DD/YY format
+      const [month, day, year] = dateParam.split('/');
+      const searchDate = `20${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      
+      const { blobs } = await store.list();
+      
+      for (const blob of blobs) {
+        const data = await store.get(blob.key);
+        const parsedData = JSON.parse(data);
+        
+        // Check if log is from requested date
+        if (parsedData.timestamp.startsWith(searchDate)) {
+          logs.push(parsedData);
+        }
+      }
     }
     
     return {
