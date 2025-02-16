@@ -1,25 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const dbPath = path.join(__dirname, 'status.json');
-
-const getStatus = async () => {
-  if (!fs.existsSync(dbPath)) {
-    await setStatus(true);
-  }
-  const data = JSON.parse(fs.readFileSync(dbPath));
-  return data.status;
-};
-
-const setStatus = async (status) => {
-  fs.writeFileSync(dbPath, JSON.stringify({ status }));
-};
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event) => {
-  // Default to GET if httpMethod is not specified
+  const store = getStore();
   const method = event.httpMethod || 'GET';
   
   if (method === 'GET') {
-    const status = await getStatus();
+    let status = await store.get('killswitch');
+    if (status === null) {
+      status = true;
+      await store.set('killswitch', true);
+    }
+    
     return {
       statusCode: 200,
       headers: {
@@ -32,7 +23,8 @@ exports.handler = async (event) => {
   
   if (method === 'POST') {
     const { status } = JSON.parse(event.body);
-    await setStatus(status);
+    await store.set('killswitch', status);
+    
     return {
       statusCode: 200,
       headers: {
@@ -42,13 +34,4 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: 'Status updated successfully' })
     };
   }
-
-  return {
-    statusCode: 405,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify({ message: 'Method not allowed' })
-  };
 };
