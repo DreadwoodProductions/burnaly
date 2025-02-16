@@ -9,11 +9,6 @@
   force = true
 
 [[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[[redirects]]
   from = "/images/*"
   to = "/images/:splat"
   status = 200
