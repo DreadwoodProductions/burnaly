@@ -1,7 +1,11 @@
 const { getStore } = require('@netlify/blobs');
 
-exports.handler = async (event) => {
-  const store = await getStore('game-thumbnails');
+exports.handler = async (event, context) => {
+  const store = await getStore('game-thumbnails', {
+    siteID: process.env.NETLIFY_SITE_ID,
+    token: process.env.NETLIFY_BLOBS_TOKEN
+  });
+  
   const placeId = event.queryStringParameters.placeId;
   
   try {
@@ -30,11 +34,6 @@ exports.handler = async (event) => {
     await store.setJSON(`thumbnail-${placeId}`, {
       imageUrl,
       cached: new Date().toISOString()
-    }, {
-      metadata: {
-        placeId,
-        universeId
-      }
     });
 
     return {
