@@ -22,7 +22,13 @@ exports.handler = async (event, context) => {
 
     // Step 1: Get universeId from placeId
     const placeResponse = await fetch(
-      `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`
+      `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; NetlifyBot/1.0)'
+        }
+      }
     );
     
     const placeData = await placeResponse.json();
@@ -45,7 +51,13 @@ exports.handler = async (event, context) => {
 
     // Step 2: Now that we have the universeId, get the thumbnail
     const thumbnailResponse = await fetch(
-      `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&size=768x432&format=Png&isCircular=false`
+      `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&size=768x432&format=Png&isCircular=false`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; NetlifyBot/1.0)'
+        }
+      }
     );
     
     const thumbnailData = await thumbnailResponse.json();
