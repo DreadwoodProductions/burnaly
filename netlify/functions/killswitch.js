@@ -15,12 +15,17 @@ const setStatus = async (status) => {
 };
 
 exports.handler = async (event) => {
-  const { method } = event;
+  // Default to GET if httpMethod is not specified
+  const method = event.httpMethod || 'GET';
   
   if (method === 'GET') {
     const status = await getStatus();
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ status })
     };
   }
@@ -30,12 +35,20 @@ exports.handler = async (event) => {
     await setStatus(status);
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ message: 'Status updated successfully' })
     };
   }
 
   return {
     statusCode: 405,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
     body: JSON.stringify({ message: 'Method not allowed' })
   };
 };
