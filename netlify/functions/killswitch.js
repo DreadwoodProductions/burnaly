@@ -1,7 +1,12 @@
 const { getStore } = require('@netlify/blobs');
 
-exports.handler = async (event) => {
-  const store = getStore('killswitch-store');
+exports.handler = async (event, context) => {
+  const store = getStore({
+    name: 'killswitch-store',
+    siteID: context.site.id,
+    token: process.env.NETLIFY_BLOBS_TOKEN
+  });
+  
   const method = event.httpMethod || 'GET';
   
   if (method === 'GET') {
