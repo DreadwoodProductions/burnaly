@@ -1,42 +1,42 @@
-const { getStore } = require('@netlify/blobs');
+let killSwitchStatus = true;
 
-exports.handler = async (event, context) => {
-  const store = getStore({
-    name: 'killswitch-store',
-    siteID: context.site.id,
-    token: process.env.NETLIFY_BLOBS_TOKEN
-  });
-  
-  const method = event.httpMethod || 'GET';
+exports.handler = async (event) => {
+  const method = event.httpMethod;
   
   if (method === 'GET') {
-    let status = await store.get('status');
-    if (status === null) {
-      status = true;
-      await store.set('status', true);
-    }
-    
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status: killSwitchStatus })
     };
   }
   
   if (method === 'POST') {
-    const { status } = JSON.parse(event.body);
-    await store.set('status', status);
-    
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ message: 'Status updated successfully' })
-    };
+    try {
+      const { status } = JSON.parse(event.body);
+      killSwitchStatus = status;
+      
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ message: 'Status updated successfully' })
+      };
+    } catch (error) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Invalid request body' })
+      };
+    }
   }
+
+  return {
+    statusCode: 405,
+    body: JSON.stringify({ error: 'Method not allowed' })
+  };
 };
