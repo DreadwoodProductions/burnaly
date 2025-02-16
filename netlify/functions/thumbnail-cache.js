@@ -9,13 +9,24 @@ exports.handler = async (event, context) => {
     });
 
     const placeId = event.queryStringParameters.placeId;
-    
+    if (!placeId) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: "Missing placeId parameter" })
+      };
+    }
+
     // Step 1: Get universeId from placeId
     const placeResponse = await fetch(
       `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`
     );
     
     const placeData = await placeResponse.json();
+    console.log('Place Data:', placeData);
     
     // Verify we have the place data before proceeding
     if (!placeData || !placeData[0]) {
@@ -30,6 +41,7 @@ exports.handler = async (event, context) => {
     }
 
     const universeId = placeData[0].universeId;
+    console.log('Universe ID:', universeId);
 
     // Step 2: Now that we have the universeId, get the thumbnail
     const thumbnailResponse = await fetch(
@@ -37,6 +49,8 @@ exports.handler = async (event, context) => {
     );
     
     const thumbnailData = await thumbnailResponse.json();
+    console.log('Thumbnail Data:', thumbnailData);
+
     const imageUrl = thumbnailData.data[0].thumbnails[0].imageUrl;
 
     const result = { 
@@ -60,6 +74,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify(result)
     };
   } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
