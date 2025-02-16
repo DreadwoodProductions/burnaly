@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>6Foot Error Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;,">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
@@ -15,7 +16,6 @@
     <template id="error-card-template">
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex items-center mb-4">
-                <img class="w-16 h-16 rounded" src="" alt="Game Icon">
                 <div class="ml-4">
                     <a href="" class="text-xl font-semibold hover:text-blue-600 game-link"></a>
                     <p class="text-gray-500 game-id"></p>
@@ -37,41 +37,52 @@
 
     <script>
         async function fetchErrorLogs() {
-            const response = await fetch('/.netlify/functions/getlogs');
-            const logs = await response.json();
-            const container = document.getElementById('error-cards');
-            const template = document.getElementById('error-card-template');
+            try {
+                const response = await fetch('/.netlify/functions/getlogs');
+                const data = await response.json();
+                const logs = Array.isArray(data) ? data : [];
+                const container = document.getElementById('error-cards');
+                const template = document.getElementById('error-card-template');
 
-            logs.forEach(log => {
-                const card = template.content.cloneNode(true);
-                
-                // Set game info
-                const gameLink = card.querySelector('.game-link');
-                gameLink.href = `https://roblox.com/games/${log.game.id}`;
-                gameLink.textContent = log.game.name;
-                card.querySelector('.game-id').textContent = `Place ID: ${log.game.id}`;
-                
-                // Set executor info
-                const executorName = card.querySelector('.executor-name');
-                const executorStatus = card.querySelector('.executor-status');
-                executorName.textContent = log.executor.name;
-                
-                if (log.executor.supported) {
-                    executorStatus.classList.add('bg-green-100', 'text-green-800');
-                    executorStatus.textContent = 'Supported';
-                } else {
-                    executorStatus.classList.add('bg-red-100', 'text-red-800');
-                    executorStatus.textContent = 'Unsupported';
+                if (logs.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">No error logs found.</p>';
+                    return;
                 }
-                
-                // Set error message
-                card.querySelector('.error-message').textContent = log.error;
-                
-                // Set timestamp
-                card.querySelector('.timestamp').textContent = new Date(log.script.timestamp).toLocaleString();
-                
-                container.appendChild(card);
-            });
+
+                logs.forEach(log => {
+                    const card = template.content.cloneNode(true);
+                    
+                    // Set game info
+                    const gameLink = card.querySelector('.game-link');
+                    gameLink.href = `https://roblox.com/games/${log.game.id}`;
+                    gameLink.textContent = log.game.name;
+                    card.querySelector('.game-id').textContent = `Place ID: ${log.game.id}`;
+                    
+                    // Set executor info
+                    const executorName = card.querySelector('.executor-name');
+                    const executorStatus = card.querySelector('.executor-status');
+                    executorName.textContent = log.executor.name;
+                    
+                    if (log.executor.supported) {
+                        executorStatus.classList.add('bg-green-100', 'text-green-800');
+                        executorStatus.textContent = 'Supported';
+                    } else {
+                        executorStatus.classList.add('bg-red-100', 'text-red-800');
+                        executorStatus.textContent = 'Unsupported';
+                    }
+                    
+                    // Set error message
+                    card.querySelector('.error-message').textContent = log.error;
+                    
+                    // Set timestamp
+                    card.querySelector('.timestamp').textContent = log.script.timestamp;
+                    
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById('error-cards').innerHTML = 
+                    '<p class="text-red-500">Failed to load error logs. Please try again.</p>';
+            }
         }
 
         fetchErrorLogs();
