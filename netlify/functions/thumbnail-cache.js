@@ -38,6 +38,18 @@ exports.handler = async (event, context) => {
       `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`
     );
     const placeInfo = await placeResponse.json();
+    
+    if (!placeInfo || !placeInfo[0]) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: "Place not found" })
+      };
+    }
+
     const universeId = placeInfo[0].universeId;
 
     // Step 2: Get thumbnail using universeId
