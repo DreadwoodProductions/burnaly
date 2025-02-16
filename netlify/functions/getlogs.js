@@ -17,34 +17,27 @@ exports.handler = async (event, context) => {
       const data = await store.get(blob.key);
       const logEntry = JSON.parse(data);
       
-      // Only include POST requests with actual error data
       if (logEntry.method === 'POST' && logEntry.data) {
         const errorData = JSON.parse(logEntry.data);
-        logs.push({
-          time: new Date(logEntry.timestamp).toLocaleString(),
-          player: errorData.player,
-          game: errorData.game,
-          script: errorData.script,
-          error: errorData.error
-        });
+        const formattedTime = new Date(logEntry.timestamp).toLocaleString();
+        logs.push(`Time: ${formattedTime}\nPlayer: ${errorData.player}\nGame: ${errorData.game}\nScript: ${errorData.script}\nError: ${errorData.error}\n-------------------`);
       }
     }
     
-    // Filter by date if provided
     if (dateParam) {
       const [month, day, year] = dateParam.split('/');
       const searchDate = `20${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      logs = logs.filter(log => log.time.includes(searchDate));
+      logs = logs.filter(log => log.includes(searchDate));
     }
     
     return {
       statusCode: 200,
-      body: JSON.stringify(logs, null, 2) // Pretty print JSON
+      body: logs.join('\n')
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      body: `Error: ${error.message}`
     };
   }
 };
