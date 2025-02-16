@@ -14,34 +14,26 @@ exports.handler = async (event, context) => {
     const { blobs } = await store.list();
     
     for (const blob of blobs) {
-      const rawData = await store.get(blob.key);
-      try {
-        const errorData = JSON.parse(rawData);
+      const data = await store.get(blob.key);
+      const parsedData = JSON.parse(data);
+      
+      if (parsedData.Body) {
+        const errorData = JSON.parse(parsedData.Body);
         logs.push({
-          time: errorData.script.timestamp,
-          game: {
-            name: errorData.game.name,
-            id: errorData.game.id
-          },
-          player: {
-            name: errorData.player.name,
-            displayName: errorData.player.displayName,
-            userId: errorData.player.userId
-          },
+          timestamp: errorData.script.timestamp,
           error: errorData.error,
-          script: errorData.script.name
+          game: errorData.game,
+          player: errorData.player,
+          script: errorData.script
         });
-      } catch (e) {
-        // Skip invalid entries
-        continue;
       }
     }
     
     // Filter by date if provided
     if (dateParam) {
       const [month, day, year] = dateParam.split('/');
-      const searchDate = `20${year}-${month}-${day}`;
-      logs = logs.filter(log => log.time.includes(searchDate));
+      const searchDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      logs = logs.filter(log => log.timestamp.includes(searchDate));
     }
     
     return {
