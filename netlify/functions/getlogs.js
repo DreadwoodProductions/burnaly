@@ -8,31 +8,38 @@ exports.handler = async (event, context) => {
       token: process.env.NETLIFY_AUTH_TOKEN
     });
     
-    // Get date from query parameter
     const dateParam = event.queryStringParameters?.date;
-    const logs = [];
+    let logs = [];
     
+    const { blobs } = await store.list();
+    
+    for (const blob of blobs) {
+      const data = await store.get(blob.key);
+      const logEntry = JSON.parse(data);
+      
+      // Only include POST requests with actual error data
+      if (logEntry.method === 'POST' && logEntry.data) {
+        const errorData = JSON.parse(logEntry.data);
+        logs.push({
+          time: new Date(logEntry.timestamp).toLocaleString(),
+          player: errorData.player,
+          game: errorData.game,
+          script: errorData.script,
+          error: errorData.error
+        });
+      }
+    }
+    
+    // Filter by date if provided
     if (dateParam) {
-      // Parse date in MM/DD/YY format
       const [month, day, year] = dateParam.split('/');
       const searchDate = `20${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      
-      const { blobs } = await store.list();
-      
-      for (const blob of blobs) {
-        const data = await store.get(blob.key);
-        const parsedData = JSON.parse(data);
-        
-        // Check if log is from requested date
-        if (parsedData.timestamp.startsWith(searchDate)) {
-          logs.push(parsedData);
-        }
-      }
+      logs = logs.filter(log => log.time.includes(searchDate));
     }
     
     return {
       statusCode: 200,
-      body: JSON.stringify(logs)
+      body: JSON.stringify(logs, null, 2) // Pretty print JSON
     };
   } catch (error) {
     return {
