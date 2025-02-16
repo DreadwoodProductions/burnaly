@@ -1,27 +1,31 @@
 const { getStore } = require('@netlify/blobs');
 
-exports.handler = async (event) => {
-  const store = getStore('error-logs');
-  const today = new Date().toISOString().split('T')[0];
-  
-  if (event.httpMethod === 'POST') {
-    const logData = {
-      timestamp: new Date().toISOString(),
-      ...JSON.parse(event.body)
+exports.handler = async (event, context) => {
+  try {
+    const store = getStore({
+      name: "errors",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_AUTH_TOKEN
+    });
+    
+    const timestamp = new Date().toISOString();
+    const logEntry = {
+      timestamp,
+      data: event.body,
+      path: event.path,
+      method: event.httpMethod
     };
     
-    let todayLogs = await store.get(`logs-${today}`, { type: 'json' }) || [];
-    todayLogs.push(logData);
-    
-    await store.setJSON(`logs-${today}`, todayLogs);
+    await store.setJSON(`error-${timestamp}`, logEntry);
     
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ message: 'Log stored successfully' })
+      body: JSON.stringify({ message: "Error logged successfully" })
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
