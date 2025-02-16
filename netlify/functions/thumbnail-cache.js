@@ -3,7 +3,7 @@ const { getStore } = require('@netlify/blobs');
 exports.handler = async (event, context) => {
   const store = await getStore('game-thumbnails', {
     siteID: process.env.NETLIFY_SITE_ID,
-    token: process.env.NETLIFY_BLOBS_TOKEN
+    token: process.env.NETLIFY_AUTH_TOKEN
   });
   
   const placeId = event.queryStringParameters.placeId;
