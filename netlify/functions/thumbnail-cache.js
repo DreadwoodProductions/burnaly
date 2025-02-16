@@ -15,10 +15,23 @@ exports.handler = async (event, context) => {
       `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`
     );
     
-    const placeInfo = await placeResponse.json();
-    const universeId = placeInfo[0].universeId;
+    const placeData = await placeResponse.json();
+    
+    // Verify we have the place data before proceeding
+    if (!placeData || !placeData[0]) {
+      return {
+        statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: "Game not found" })
+      };
+    }
 
-    // Step 2: Get thumbnail using universeId
+    const universeId = placeData[0].universeId;
+
+    // Step 2: Now that we have the universeId, get the thumbnail
     const thumbnailResponse = await fetch(
       `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&size=768x432&format=Png&isCircular=false`
     );
@@ -28,9 +41,9 @@ exports.handler = async (event, context) => {
 
     const result = { 
       imageUrl,
-      name: placeInfo[0].name,
-      description: placeInfo[0].description,
-      builder: placeInfo[0].builder,
+      name: placeData[0].name,
+      description: placeData[0].description,
+      builder: placeData[0].builder,
       placeId: parseInt(placeId),
       universeId,
       cached: new Date().toISOString()
