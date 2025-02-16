@@ -1,13 +1,9 @@
 const { getStore } = require('@netlify/blobs');
 
-exports.handler = async (event, context) => {
-  const store = getStore({
-    name: 'error-logs',
-    siteID: context.site.id,
-    token: process.env.NETLIFY_BLOBS_TOKEN
-  });
-
+exports.handler = async (event) => {
+  const store = getStore('error-logs');
   const date = event.queryStringParameters?.date || new Date().toISOString().split('T')[0];
+  
   const logs = await store.get(`logs-${date}`, { type: 'json' }) || [];
   
   return {
