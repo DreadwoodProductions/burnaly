@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>6Foot Error Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">6Foot Script Error Logs</h1>
+        <div id="error-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Error cards will be inserted here -->
+        </div>
+    </div>
+
+    <template id="error-card-template">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-4">
+                <img class="w-16 h-16 rounded" src="" alt="Game Icon">
+                <div class="ml-4">
+                    <a href="" class="text-xl font-semibold hover:text-blue-600 game-link"></a>
+                    <p class="text-gray-500 game-id"></p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <span class="font-medium">Executor: </span>
+                <span class="executor-name"></span>
+                <span class="executor-status ml-2 px-2 py-1 rounded text-sm"></span>
+            </div>
+            <div class="bg-gray-50 rounded p-4">
+                <pre class="error-message text-red-600 whitespace-pre-wrap"></pre>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <span class="timestamp"></span>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        async function fetchErrorLogs() {
+            const response = await fetch('/.netlify/functions/getlogs');
+            const logs = await response.json();
+            const container = document.getElementById('error-cards');
+            const template = document.getElementById('error-card-template');
+
+            logs.forEach(log => {
+                const card = template.content.cloneNode(true);
+                
+                // Set game info
+                const gameLink = card.querySelector('.game-link');
+                gameLink.href = `https://roblox.com/games/${log.game.id}`;
+                gameLink.textContent = log.game.name;
+                card.querySelector('.game-id').textContent = `Place ID: ${log.game.id}`;
+                
+                // Set executor info
+                const executorName = card.querySelector('.executor-name');
+                const executorStatus = card.querySelector('.executor-status');
+                executorName.textContent = log.executor.name;
+                
+                if (log.executor.supported) {
+                    executorStatus.classList.add('bg-green-100', 'text-green-800');
+                    executorStatus.textContent = 'Supported';
+                } else {
+                    executorStatus.classList.add('bg-red-100', 'text-red-800');
+                    executorStatus.textContent = 'Unsupported';
+                }
+                
+                // Set error message
+                card.querySelector('.error-message').textContent = log.error;
+                
+                // Set timestamp
+                card.querySelector('.timestamp').textContent = new Date(log.script.timestamp).toLocaleString();
+                
+                container.appendChild(card);
+            });
+        }
+
+        fetchErrorLogs();
+    </script>
+</body>
+</html>
