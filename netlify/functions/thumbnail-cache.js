@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Check if thumbnail exists in cache
+    // Check cache first
     const cachedThumbnail = await store.get(`thumbnail-${placeId}`, { type: 'json' });
     if (cachedThumbnail) {
       return {
@@ -33,25 +33,27 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Fetch from Roblox APIs if not cached
+    // Step 1: Get universeId from placeId
     const placeResponse = await fetch(
       `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`
     );
     const placeInfo = await placeResponse.json();
-
-    if (!placeInfo || !placeInfo[0] || !placeInfo[0].universeId) {
-      throw new Error("Invalid place information received from Roblox API");
-    }
-
     const universeId = placeInfo[0].universeId;
+
+    // Step 2: Get thumbnail using universeId
     const thumbnailResponse = await fetch(
       `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&size=768x432&format=Png&isCircular=false`
     );
     const thumbnailData = await thumbnailResponse.json();
-
     const imageUrl = thumbnailData.data[0].thumbnails[0].imageUrl;
 
-    const result = { imageUrl, cached: new Date().toISOString() };
+    const result = { 
+      imageUrl, 
+      cached: new Date().toISOString(),
+      placeId,
+      universeId 
+    };
+    
     await store.setJSON(`thumbnail-${placeId}`, result);
 
     return {
