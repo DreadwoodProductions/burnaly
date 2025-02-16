@@ -3,20 +3,17 @@ const { getStore } = require('@netlify/blobs');
 exports.handler = async (event, context) => {
   try {
     const store = getStore({
-      name: "errors",
+      name: "roblox-errors",
       siteID: process.env.NETLIFY_SITE_ID,
       token: process.env.NETLIFY_AUTH_TOKEN
     });
     
+    // Generate a unique key for each error
     const timestamp = new Date().toISOString();
-    const logEntry = {
-      timestamp,
-      data: event.body,
-      path: event.path,
-      method: event.httpMethod
-    };
+    const key = `error-${timestamp}`;
     
-    await store.setJSON(`error-${timestamp}`, logEntry);
+    // Store the error data
+    await store.set(key, event.body);
     
     return {
       statusCode: 200,
