@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
     const logs = [];
     
     for (const blob of blobs) {
-      const data = await store.getJSON(blob.key);
+      const data = await store.get(blob.key, { type: 'json' });
       logs.push(data);
     }
     
