@@ -1,14 +1,14 @@
 const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event) => {
-  const store = getStore();
+  const store = getStore('killswitch-store');
   const method = event.httpMethod || 'GET';
   
   if (method === 'GET') {
-    let status = await store.get('killswitch');
+    let status = await store.get('status');
     if (status === null) {
       status = true;
-      await store.set('killswitch', true);
+      await store.set('status', true);
     }
     
     return {
@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   
   if (method === 'POST') {
     const { status } = JSON.parse(event.body);
-    await store.set('killswitch', status);
+    await store.set('status', status);
     
     return {
       statusCode: 200,
