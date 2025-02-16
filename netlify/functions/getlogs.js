@@ -14,32 +14,39 @@ exports.handler = async (event, context) => {
     const { blobs } = await store.list();
     
     for (const blob of blobs) {
-      const data = await store.get(blob.key);
-      const logEntry = JSON.parse(data);
-      
-      // Only include POST requests with actual error data
-      if (logEntry.method === 'POST' && logEntry.data) {
-        const errorData = JSON.parse(logEntry.data);
+      const rawData = await store.get(blob.key);
+      try {
+        const errorData = JSON.parse(rawData);
         logs.push({
-          time: new Date(logEntry.timestamp).toLocaleString(),
-          player: errorData.player,
-          game: errorData.game,
-          script: errorData.script,
-          error: errorData.error
+          time: errorData.script.timestamp,
+          game: {
+            name: errorData.game.name,
+            id: errorData.game.id
+          },
+          player: {
+            name: errorData.player.name,
+            displayName: errorData.player.displayName,
+            userId: errorData.player.userId
+          },
+          error: errorData.error,
+          script: errorData.script.name
         });
+      } catch (e) {
+        // Skip invalid entries
+        continue;
       }
     }
     
     // Filter by date if provided
     if (dateParam) {
       const [month, day, year] = dateParam.split('/');
-      const searchDate = `20${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      const searchDate = `20${year}-${month}-${day}`;
       logs = logs.filter(log => log.time.includes(searchDate));
     }
     
     return {
       statusCode: 200,
-      body: JSON.stringify(logs, null, 2) // Pretty print JSON
+      body: JSON.stringify(logs, null, 2)
     };
   } catch (error) {
     return {
