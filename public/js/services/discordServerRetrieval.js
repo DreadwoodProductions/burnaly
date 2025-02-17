@@ -1,43 +1,36 @@
-// Make it a module that can be imported in browser
-export async function getUserDiscordServers(accessToken) {
-    const DISCORD_API = 'https://discord.com/api/v10';
-    
-    if (!accessToken) {
-        throw new Error('Access token is required');
-    }
-
+export async function setupServerList() {
     try {
-        const response = await fetch(`${DISCORD_API}/users/@me/guilds`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch('/.netlify/functions/getGuilds');
+        const guilds = await response.json();
+        
+        const serversList = document.getElementById('servers-list');
+        serversList.innerHTML = '';
+
+        guilds.forEach(guild => {
+            const serverCard = createServerCard(guild);
+            serversList.appendChild(serverCard);
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.map(guild => ({
-            id: guild.id,
-            name: guild.name,
-            icon: guild.icon,
-            owner: guild.owner,
-            permissions: guild.permissions
-        }));
-
     } catch (error) {
-        if (error.response) {
-            switch (error.response.status) {
-                case 401:
-                    throw new Error('Invalid or expired access token');
-                case 429:
-                    throw new Error('Rate limit exceeded');
-                default:
-                    throw new Error(`Discord API error: ${error.response.status}`);
-            }
-        }
-        throw new Error('Failed to fetch Discord servers');
+        console.error('Failed to fetch servers:', error);
     }
+}
+
+function createServerCard(guild) {
+    const card = document.createElement('div');
+    card.className = 'server-card';
+    
+    const iconUrl = guild.icon 
+        ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+        : '/images/default-server-icon.png';
+
+    card.innerHTML = `
+        <img src="${iconUrl}" alt="${guild.name}" class="server-icon">
+        <div class="server-info">
+            <h4>${guild.name}</h4>
+            <p>${guild.approximate_member_count || 'N/A'} members</p>
+        </div>
+        <button class="manage-btn">Manage</button>
+    `;
+
+    return card;
 }
