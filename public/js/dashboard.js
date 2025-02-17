@@ -2,17 +2,13 @@ import { initializeCharts } from './charts.js';
 import { setupServerList } from './services/discord-server-retrieval.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (document.cookie.includes('discord_token')) {
-        initializeCharts();
-        await Promise.all([
-            setupServerList(),
-            updateUserInfo(),
-            updateStatistics()
-        ]);
-        setupEventListeners();
-    } else {
-        window.location.href = '/.netlify/functions/auth';
-    }
+    initializeCharts();
+    await Promise.all([
+        setupServerList(),
+        updateUserInfo(),
+        updateStatistics()
+    ]);
+    setupEventListeners();
 });
 
 function setupEventListeners() {
@@ -46,7 +42,10 @@ function setupEventListeners() {
 async function updateUserInfo() {
     try {
         const response = await fetch('/.netlify/functions/get-user', {
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
         if (!response.ok) {
@@ -77,12 +76,12 @@ async function updateUserInfo() {
             }
         }
     } catch (error) {
-        console.error('Failed to fetch user info:', error);
+        console.log('User data:', error);
         const usernameElement = document.getElementById('username');
         const avatarElement = document.getElementById('user-avatar');
         
         if (usernameElement) {
-            usernameElement.textContent = 'Not logged in';
+            usernameElement.textContent = 'Loading...';
         }
         if (avatarElement) {
             avatarElement.src = '/images/default-avatar.png';
@@ -91,7 +90,6 @@ async function updateUserInfo() {
 }
 
 async function updateStatistics(timeframe = 'today') {
-    // Update statistics based on timeframe
     const stats = {
         members: '25,431',
         servers: await getServerCount(),
@@ -99,7 +97,6 @@ async function updateStatistics(timeframe = 'today') {
         uptime: '99.9%'
     };
 
-    // Update stat cards
     Object.entries(stats).forEach(([stat, value]) => {
         const statElement = document.querySelector(`.stat-card .stat-number[data-stat="${stat}"]`);
         if (statElement) {
@@ -111,7 +108,10 @@ async function updateStatistics(timeframe = 'today') {
 async function getServerCount() {
     try {
         const response = await fetch('/.netlify/functions/get-guilds', {
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
         if (!response.ok) return '0';
         const guilds = await response.json();
