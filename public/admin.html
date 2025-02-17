@@ -2,19 +2,40 @@
 <html>
 <head>
     <title>Kill Switch Admin</title>
+    <link rel="stylesheet" href="public/css/admin.css">
 </head>
-<body>
-    <button onclick="setStatus(true)">Enable Script</button>
-    <button onclick="setStatus(false)">Disable Script</button>
-    
-    <script>
-        async function setStatus(status) {
-            await fetch('/.netlify/functions/killswitch', {
-                method: 'POST',
-                body: JSON.stringify({ status })
-            });
-            alert(`Script ${status ? 'enabled' : 'disabled'} successfully`);
-        }
-    </script>
+<body style="background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
+    <div id="loginForm">
+        <form class="form" onsubmit="return handleLogin(event)">
+            <div class="form-title"><span>sign in to your</span></div>
+            <div class="title-2"><span>SPACE</span></div>
+            <div class="input-container">
+                <input placeholder="Email" type="email" class="input-mail" id="email" required/>
+                <span> </span>
+            </div>
+            <section class="bg-stars">
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+            </section>
+            <div class="input-container">
+                <input placeholder="Password" type="password" class="input-pwd" id="password" required/>
+            </div>
+            <button class="submit" type="submit">
+                <span class="sign-text">Sign in</span>
+            </button>
+        </form>
+    </div>
+
+    <div id="adminPanel" style="display: none;">
+        <h2 style="color: white; margin-bottom: 20px;">Kill Switch Control Panel</h2>
+        <button onclick="setStatus(true)" class="admin-btn">Enable Script</button>
+        <button onclick="setStatus(false)" class="admin-btn">Disable Script</button>
+        <br>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
+
+    <script src="public/js/admin.js"></script>
 </body>
 </html>
