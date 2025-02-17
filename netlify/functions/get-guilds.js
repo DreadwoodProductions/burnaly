@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   const token = event.headers.cookie?.split(';')
     .find(c => c.trim().startsWith('discord_token='))
     ?.split('=')[1];
