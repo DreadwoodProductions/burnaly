@@ -38,6 +38,11 @@
   to = "/admin.html"
   status = 200
 
+[[redirects]]
+  from = "/.netlify/functions/callback"
+  to = "/.netlify/functions/auth"
+  status = 200
+
 [dev]
   framework = "#static"
 
