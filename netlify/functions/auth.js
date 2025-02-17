@@ -5,6 +5,20 @@ export const handler = async (event, context) => {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
   const redirectUri = 'https://burnaly.com/.netlify/functions/auth';
 
+  const existingToken = event.headers.cookie?.split(';')
+    .find(c => c.trim().startsWith('discord_token='));
+  
+  if (existingToken) {
+    return {
+      statusCode: 302,
+      headers: {
+        'Location': '/dashboard',
+        'Cache-Control': 'no-cache'
+      },
+      body: ''
+    };
+  }
+
   if (event.queryStringParameters.code) {
     const code = event.queryStringParameters.code;
     
@@ -26,7 +40,6 @@ export const handler = async (event, context) => {
 
       const tokenData = await tokenResponse.json();
       
-      // Set cookie and redirect to dashboard
       return {
         statusCode: 302,
         headers: {
