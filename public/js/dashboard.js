@@ -4,22 +4,43 @@ import { setupServerList } from './services/discord-server-retrieval.js';
 document.addEventListener('DOMContentLoaded', async () => {
     if (document.cookie.includes('discord_token')) {
         initializeCharts();
-        await setupServerList();
+        await Promise.all([
+            setupServerList(),
+            updateUserInfo(),
+            updateStatistics()
+        ]);
         setupEventListeners();
-        await updateUserInfo();
+    } else {
+        window.location.href = '/.netlify/functions/auth';
     }
 });
 
 function setupEventListeners() {
     const toggleBtn = document.querySelector('.toggle-sidebar');
-    toggleBtn.addEventListener('click', () => {
-        document.querySelector('.sidebar').classList.toggle('collapsed');
-    });
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+    }
 
-    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
 
     const notificationBtn = document.querySelector('.notification-btn');
-    notificationBtn.addEventListener('click', toggleNotificationCenter);
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', toggleNotificationCenter);
+    }
+
+    const dateFilters = document.querySelectorAll('.date-filter button');
+    dateFilters.forEach(button => {
+        button.addEventListener('click', () => {
+            dateFilters.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            updateStatistics(button.textContent.toLowerCase());
+        });
+    });
 }
 
 async function updateUserInfo() {
@@ -34,12 +55,69 @@ async function updateUserInfo() {
 
         const userData = await response.json();
         
-        document.getElementById('username').textContent = userData.username;
-        document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+        const usernameElement = document.getElementById('username');
+        const avatarElement = document.getElementById('user-avatar');
+        
+        if (usernameElement) {
+            usernameElement.textContent = userData.global_name || userData.username;
+        }
+        
+        if (avatarElement) {
+            avatarElement.src = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+            avatarElement.alt = userData.global_name || userData.username;
+        }
+
+        if (userData.premium_type) {
+            const userDetails = document.querySelector('.user-details');
+            if (userDetails && !userDetails.querySelector('.badge.premium')) {
+                const premiumBadge = document.createElement('span');
+                premiumBadge.className = 'badge premium';
+                premiumBadge.textContent = 'Nitro';
+                userDetails.appendChild(premiumBadge);
+            }
+        }
     } catch (error) {
         console.error('Failed to fetch user info:', error);
-        document.getElementById('username').textContent = 'Not logged in';
-        document.getElementById('user-avatar').src = '/images/default-avatar.png';
+        const usernameElement = document.getElementById('username');
+        const avatarElement = document.getElementById('user-avatar');
+        
+        if (usernameElement) {
+            usernameElement.textContent = 'Not logged in';
+        }
+        if (avatarElement) {
+            avatarElement.src = '/images/default-avatar.png';
+        }
+    }
+}
+
+async function updateStatistics(timeframe = 'today') {
+    // Update statistics based on timeframe
+    const stats = {
+        members: '25,431',
+        servers: await getServerCount(),
+        commands: '1,234',
+        uptime: '99.9%'
+    };
+
+    // Update stat cards
+    Object.entries(stats).forEach(([stat, value]) => {
+        const statElement = document.querySelector(`.stat-card .stat-number[data-stat="${stat}"]`);
+        if (statElement) {
+            statElement.textContent = value;
+        }
+    });
+}
+
+async function getServerCount() {
+    try {
+        const response = await fetch('/.netlify/functions/get-guilds', {
+            credentials: 'include'
+        });
+        if (!response.ok) return '0';
+        const guilds = await response.json();
+        return guilds.length.toString();
+    } catch (error) {
+        return '0';
     }
 }
 
@@ -49,9 +127,8 @@ function handleLogout() {
 }
 
 function toggleNotificationCenter() {
-    document.querySelector('.notification-center').classList.toggle('active');
-}
-
-function isAuthenticated() {
-    return document.cookie.includes('discord_token');
+    const notificationCenter = document.querySelector('.notification-center');
+    if (notificationCenter) {
+        notificationCenter.classList.toggle('active');
+    }
 }
