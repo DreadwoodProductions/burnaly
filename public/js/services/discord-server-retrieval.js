@@ -9,7 +9,6 @@ export async function setupServerList() {
         }
 
         const guilds = await response.json();
-
         const serversList = document.getElementById('servers-list');
         serversList.innerHTML = '';
 
@@ -17,10 +16,15 @@ export async function setupServerList() {
             const serverCard = createServerCard(guild);
             serversList.appendChild(serverCard);
         });
+
+        // Update total servers stat
+        const serverStatNumber = document.querySelector('.stat-card:nth-child(2) .stat-number');
+        if (serverStatNumber) {
+            serverStatNumber.textContent = guilds.length;
+        }
     } catch (error) {
         console.error('Failed to fetch servers:', error);
-        const serversList = document.getElementById('servers-list');
-        serversList.innerHTML = '<div class="error-message">Failed to load servers. Please try again.</div>';
+        document.getElementById('servers-list').innerHTML = '<div class="error-message">Failed to load servers</div>';
     }
 }
 
@@ -36,10 +40,19 @@ function createServerCard(guild) {
         <img src="${iconUrl}" alt="${guild.name}" class="server-icon">
         <div class="server-info">
             <h4>${guild.name}</h4>
-            <p>${guild.approximate_member_count || 'N/A'} members</p>
+            <div class="server-features">
+                ${guild.features.includes('VERIFIED') ? '<span class="badge verified">Verified</span>' : ''}
+                ${guild.features.includes('COMMUNITY') ? '<span class="badge community">Community</span>' : ''}
+            </div>
         </div>
-        <button class="manage-btn">Manage</button>
+        <button class="manage-btn" data-server-id="${guild.id}">Manage</button>
     `;
+
+    // Add click event listener to the manage button
+    const manageBtn = card.querySelector('.manage-btn');
+    manageBtn.addEventListener('click', () => {
+        window.location.href = `/dashboard/server/${guild.id}`;
+    });
 
     return card;
 }
