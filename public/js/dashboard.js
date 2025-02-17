@@ -26,12 +26,27 @@ function setupEventListeners() {
 async function updateUserInfo() {
     try {
         const response = await fetch('/.netlify/functions/getUserInfo');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const userData = await response.json();
         
-        document.getElementById('username').textContent = userData.username;
-        document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+        if (userData.error) {
+            throw new Error(userData.error);
+        }
+        
+        document.getElementById('username').textContent = userData.username || 'Unknown User';
+        if (userData.id && userData.avatar) {
+            document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+        } else {
+            document.getElementById('user-avatar').src = '/images/default-avatar.png';
+        }
     } catch (error) {
         console.error('Failed to fetch user info:', error);
+        document.getElementById('username').textContent = 'Not logged in';
+        document.getElementById('user-avatar').src = '/images/default-avatar.png';
     }
 }
 
