@@ -48,6 +48,3 @@ async function fetchErrorLogs() {
 
 // Initial load
 fetchErrorLogs();
-
-// Refresh every 30 seconds
-setInterval(fetchErrorLogs, 30000);
