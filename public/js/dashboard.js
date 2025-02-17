@@ -2,15 +2,12 @@ import { initializeCharts } from './charts.js';
 import { setupServerList } from './services/discord-server-retrieval.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!isAuthenticated()) {
-        window.location.href = '/.netlify/functions/auth';
-        return;
+    if (document.cookie.includes('discord_token')) {
+        initializeCharts();
+        await setupServerList();
+        setupEventListeners();
+        await updateUserInfo();
     }
-    
-    initializeCharts();
-    await setupServerList();
-    setupEventListeners();
-    await updateUserInfo();
 });
 
 function setupEventListeners() {
