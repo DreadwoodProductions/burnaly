@@ -27,12 +27,12 @@ export const handler = async (event, context) => {
       const tokenData = await tokenResponse.json();
 
       return {
-        statusCode: 200,
+        statusCode: 302,
         headers: {
           'Set-Cookie': `discord_token=${tokenData.access_token}; Path=/; HttpOnly; Secure; SameSite=Strict`,
-          'Location': '/dashboard.html',
+          'Location': '/dashboard.html'
         },
-        body: JSON.stringify({ message: 'Authentication successful' }),
+        body: ''
       };
     } catch (error) {
       return {
