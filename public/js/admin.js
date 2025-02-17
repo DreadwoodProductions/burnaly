@@ -11,12 +11,17 @@ function checkAuth() {
 
 async function handleLogin(event) {
     event.preventDefault();
+    document.getElementById('loading').style.display = 'flex';
+    
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     try {
         const response = await fetch('/.netlify/functions/login', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ email, password })
         });
 
@@ -24,17 +29,21 @@ async function handleLogin(event) {
             const data = await response.json();
             localStorage.setItem('adminToken', data.token);
             showAdminPanel();
+            showNotification('Login successful');
         } else {
-            alert('Invalid credentials');
+            showNotification('Invalid credentials');
         }
     } catch (error) {
-        alert('Login failed');
+        showNotification('Login failed');
     }
+    
+    document.getElementById('loading').style.display = 'none';
 }
 
 function logout() {
     localStorage.removeItem('adminToken');
     showLoginForm();
+    showNotification('Logged out successfully');
 }
 
 function showLoginForm() {
@@ -47,31 +56,42 @@ function showAdminPanel() {
     document.getElementById('adminPanel').style.display = 'block';
 }
 
-async function setStatus(status) {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-        showLoginForm();
-        return;
-    }
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    document.getElementById('notification-message').textContent = message;
+    notification.style.display = 'flex';
+    setTimeout(() => {
+        hideNotification();
+    }, 3000);
+}
 
+function hideNotification() {
+    document.getElementById('notification').style.display = 'none';
+}
+
+async function setStatus(status) {
+    document.getElementById('loading').style.display = 'flex';
     try {
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ status })
         });
-
+        
         if (response.ok) {
-            alert(`Script ${status ? 'enabled' : 'disabled'} successfully`);
+            showNotification(`Script ${status ? 'enabled' : 'disabled'} successfully`);
         } else if (response.status === 401) {
             localStorage.removeItem('adminToken');
             showLoginForm();
+            showNotification('Session expired. Please login again');
         } else {
-            alert('Operation failed');
+            showNotification('Operation failed');
         }
     } catch (error) {
-        alert('Operation failed');
+        showNotification('Operation failed');
     }
+    document.getElementById('loading').style.display = 'none';
 }
