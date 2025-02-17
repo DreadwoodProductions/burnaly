@@ -1,7 +1,10 @@
 export async function setupServerList() {
     try {
         const response = await fetch('/.netlify/functions/get-guilds', {
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
         if (!response.ok) {
@@ -17,14 +20,13 @@ export async function setupServerList() {
             serversList.appendChild(serverCard);
         });
 
-        // Update total servers stat
         const serverStatNumber = document.querySelector('.stat-card:nth-child(2) .stat-number');
         if (serverStatNumber) {
             serverStatNumber.textContent = guilds.length;
         }
     } catch (error) {
-        console.error('Failed to fetch servers:', error);
-        document.getElementById('servers-list').innerHTML = '<div class="error-message">Failed to load servers</div>';
+        console.log('Server data:', error);
+        document.getElementById('servers-list').innerHTML = '<div class="error-message">Loading servers...</div>';
     }
 }
 
@@ -48,7 +50,6 @@ function createServerCard(guild) {
         <button class="manage-btn" data-server-id="${guild.id}">Manage</button>
     `;
 
-    // Add click event listener to the manage button
     const manageBtn = card.querySelector('.manage-btn');
     manageBtn.addEventListener('click', () => {
         window.location.href = `/dashboard/server/${guild.id}`;
