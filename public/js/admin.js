@@ -114,18 +114,13 @@ async function checkKillswitchStatus() {
         }
 
         const data = await response.json();
-        const statusElement = document.getElementById('killswitchStatus');
-        const indicator = document.getElementById('statusIndicator');
         
-        // Force DOM update with the new status
-        statusElement.textContent = data.status ? 'Enabled' : 'Disabled';
-        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
+        // Force immediate DOM updates
+        document.getElementById('killswitchStatus').textContent = data.status ? 'Enabled' : 'Disabled';
+        document.getElementById('statusIndicator').className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         
-        // Update timestamp
-        const now = new Date();
-        document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
-        
-        return data.status; // Return the status for other functions to use
+        return data.status;
     } catch (error) {
         console.error('Failed to fetch killswitch status:', error);
         return null;
@@ -146,10 +141,8 @@ async function setStatus(enabled) {
         });
         
         if (response.ok) {
-            const { status } = await response.json();
-            const statusMessage = status ? 'enabled' : 'disabled';
-            showNotification(`Script has been successfully ${statusMessage}`);
-            await checkKillswitchStatus(); // Refresh the status display
+            showNotification(`Script has been successfully ${enabled ? 'enabled' : 'disabled'}`);
+            await checkKillswitchStatus();
         } else {
             showNotification('Failed to update status');
         }
