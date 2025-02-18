@@ -9,6 +9,14 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Ensure method is POST
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
+  }
+
   try {
     const store = getStore({
       name: "killswitch",
@@ -16,7 +24,14 @@ exports.handler = async (event, context) => {
       token: process.env.NETLIFY_AUTH_TOKEN
     });
 
-    const status = await store.get('status') || false;
+    // Get current status
+    const currentStatus = await store.get('status') || false;
+    
+    // Toggle the status
+    const newStatus = !currentStatus;
+    
+    // Set the new toggled status
+    await store.set('status', newStatus);
 
     return {
       statusCode: 200,
@@ -24,7 +39,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status: newStatus })
     };
   } catch (error) {
     return {
