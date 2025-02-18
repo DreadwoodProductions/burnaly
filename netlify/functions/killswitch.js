@@ -23,9 +23,8 @@ exports.handler = async (event) => {
   
   if (method === 'POST') {
     try {
-      const currentStatus = await store.get('status') || false;
-      const newStatus = !currentStatus;
-      await store.set('status', newStatus);
+      const { status } = JSON.parse(event.body);
+      await store.set('status', status);
       
       return {
         statusCode: 200,
@@ -33,7 +32,7 @@ exports.handler = async (event) => {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status })
       };
     } catch (error) {
       return {
