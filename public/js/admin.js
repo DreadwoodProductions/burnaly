@@ -100,9 +100,7 @@ function initializeCharts() {
 }
 
 async function checkKillswitchStatus() {
-    console.log('Starting checkKillswitchStatus function');
     try {
-        console.log('Fetching status from killswitch endpoint');
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'GET',
             headers: {
@@ -110,36 +108,25 @@ async function checkKillswitchStatus() {
             }
         });
         
-        console.log('Response status:', response.status);
-        
         if (response.status === 401) {
-            console.log('Unauthorized access, logging out');
             logout();
             return;
         }
 
         const data = await response.json();
-        console.log('Received data from server:', data);
+        // Convert string to boolean
+        const status = data.status === true || data.status === 'true';
         
         const statusElement = document.getElementById('killswitchStatus');
         const indicator = document.getElementById('statusIndicator');
         
-        console.log('Current status value:', data.status);
-        console.log('Current DOM status text:', statusElement.textContent);
-        console.log('Current indicator classes:', indicator.className);
+        // Update UI based on boolean value
+        indicator.className = `w-4 h-4 rounded-full mr-3 ${status ? 'bg-green-500' : 'bg-red-500'}`;
+        statusElement.textContent = status ? 'Enabled' : 'Disabled';
         
-        // Update UI
-        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
-        statusElement.textContent = data.status ? 'Enabled' : 'Disabled';
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         
-        console.log('Updated indicator classes:', indicator.className);
-        console.log('Updated status text:', statusElement.textContent);
-        
-        const timestamp = new Date().toLocaleTimeString();
-        document.getElementById('lastUpdated').textContent = timestamp;
-        console.log('Updated timestamp:', timestamp);
-        
-        return data.status;
+        return status;
     } catch (error) {
         console.error('Error in checkKillswitchStatus:', error);
         return null;
