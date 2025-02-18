@@ -100,7 +100,9 @@ function initializeCharts() {
 }
 
 async function checkKillswitchStatus() {
+    console.log('Starting checkKillswitchStatus function');
     try {
+        console.log('Fetching status from killswitch endpoint');
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'GET',
             headers: {
@@ -108,37 +110,48 @@ async function checkKillswitchStatus() {
             }
         });
         
+        console.log('Response status:', response.status);
+        
         if (response.status === 401) {
+            console.log('Unauthorized access, logging out');
             logout();
             return;
         }
 
         const data = await response.json();
+        console.log('Received data from server:', data);
+        
         const statusElement = document.getElementById('killswitchStatus');
         const indicator = document.getElementById('statusIndicator');
         
-        // Clear any existing classes first
-        indicator.className = '';
-        // Add the base classes and the dynamic color class
-        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
+        console.log('Current status value:', data.status);
+        console.log('Current DOM status text:', statusElement.textContent);
+        console.log('Current indicator classes:', indicator.className);
         
-        // Update the text content
+        // Update UI
+        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
         statusElement.textContent = data.status ? 'Enabled' : 'Disabled';
         
-        // Update timestamp
-        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        console.log('Updated indicator classes:', indicator.className);
+        console.log('Updated status text:', statusElement.textContent);
+        
+        const timestamp = new Date().toLocaleTimeString();
+        document.getElementById('lastUpdated').textContent = timestamp;
+        console.log('Updated timestamp:', timestamp);
         
         return data.status;
     } catch (error) {
-        console.error('Failed to fetch killswitch status:', error);
+        console.error('Error in checkKillswitchStatus:', error);
         return null;
     }
 }
 
 async function setStatus(enabled) {
+    console.log('Starting setStatus function with enabled:', enabled);
     document.getElementById('loading').style.display = 'flex';
     
     try {
+        console.log('Sending POST request to update status');
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
@@ -148,16 +161,28 @@ async function setStatus(enabled) {
             body: JSON.stringify({ status: enabled })
         });
         
+        console.log('POST response status:', response.status);
+        
         if (response.ok) {
-            showNotification(`Script has been successfully ${enabled ? 'enabled' : 'disabled'}`);
+            const data = await response.json();
+            console.log('Received response data:', data);
+            
+            const message = `Script has been successfully ${enabled ? 'enabled' : 'disabled'}`;
+            console.log('Showing notification:', message);
+            showNotification(message);
+            
+            console.log('Refreshing status display');
             await checkKillswitchStatus();
         } else {
+            console.log('Failed to update status');
             showNotification('Failed to update status');
         }
     } catch (error) {
+        console.error('Error in setStatus:', error);
         showNotification('Failed to update status');
     }
     
+    console.log('Hiding loading indicator');
     document.getElementById('loading').style.display = 'none';
 }
 
