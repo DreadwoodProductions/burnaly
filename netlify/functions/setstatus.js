@@ -24,11 +24,14 @@ exports.handler = async (event, context) => {
       token: process.env.NETLIFY_AUTH_TOKEN
     });
 
-    // Parse the incoming status from request body
-    const { status } = JSON.parse(event.body);
-
-    // Set the new status
-    await store.set('status', status);
+    // Get current status
+    const currentStatus = await store.get('status') || false;
+    
+    // Toggle the status
+    const newStatus = !currentStatus;
+    
+    // Set the new toggled status
+    await store.set('status', newStatus);
 
     return {
       statusCode: 200,
@@ -36,7 +39,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status: newStatus })
     };
   } catch (error) {
     return {
