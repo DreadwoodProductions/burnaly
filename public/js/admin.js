@@ -125,7 +125,7 @@ async function checkKillswitchStatus() {
     }
 }
 
-async function setStatus() {
+async function setStatus(enabled) {
     document.getElementById('loading').style.display = 'flex';
     
     try {
@@ -134,13 +134,15 @@ async function setStatus() {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ status: enabled })
         });
         
         if (response.ok) {
             const { status } = await response.json();
-            showNotification(`Script ${status ? 'enabled' : 'disabled'} successfully`);
-            checkKillswitchStatus();
+            const statusMessage = status ? 'enabled' : 'disabled';
+            showNotification(`Script has been successfully ${statusMessage}`);
+            await checkKillswitchStatus(); // Refresh the status display
         } else {
             showNotification('Failed to update status');
         }
