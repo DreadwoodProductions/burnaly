@@ -9,10 +9,16 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Ensure method is POST
-  if (event.httpMethod !== 'POST') {
+  // Ensure method is GET
+  if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
+      headers: {
+        'Allow': 'GET',
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET'
+      },
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -23,15 +29,7 @@ exports.handler = async (event, context) => {
       siteID: process.env.NETLIFY_SITE_ID,
       token: process.env.NETLIFY_AUTH_TOKEN
     });
-
-    // Get current status
-    const currentStatus = await store.get('status') || false;
-    
-    // Toggle the status
-    const newStatus = !currentStatus;
-    
-    // Set the new toggled status
-    await store.set('status', newStatus);
+    const status = await store.get('status') || false;
 
     return {
       statusCode: 200,
@@ -39,7 +37,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify({ status })
     };
   } catch (error) {
     return {
