@@ -134,11 +134,9 @@ async function checkKillswitchStatus() {
 }
 
 async function setStatus(enabled) {
-    console.log('Starting setStatus function with enabled:', enabled);
     document.getElementById('loading').style.display = 'flex';
     
     try {
-        console.log('Sending POST request to update status');
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
@@ -148,28 +146,26 @@ async function setStatus(enabled) {
             body: JSON.stringify({ status: enabled })
         });
         
-        console.log('POST response status:', response.status);
-        
         if (response.ok) {
             const data = await response.json();
-            console.log('Received response data:', data);
             
-            const message = `Script has been successfully ${enabled ? 'enabled' : 'disabled'}`;
-            console.log('Showing notification:', message);
-            showNotification(message);
+            // Force immediate UI update
+            const statusElement = document.getElementById('killswitchStatus');
+            const indicator = document.getElementById('statusIndicator');
             
-            console.log('Refreshing status display');
-            await checkKillswitchStatus();
-        } else {
-            console.log('Failed to update status');
-            showNotification('Failed to update status');
+            indicator.className = `w-4 h-4 rounded-full mr-3 ${enabled ? 'bg-green-500' : 'bg-red-500'}`;
+            statusElement.textContent = enabled ? 'Enabled' : 'Disabled';
+            
+            showNotification(`Script has been successfully ${enabled ? 'enabled' : 'disabled'}`);
+            
+            // Update timestamp
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         }
     } catch (error) {
         console.error('Error in setStatus:', error);
         showNotification('Failed to update status');
     }
     
-    console.log('Hiding loading indicator');
     document.getElementById('loading').style.display = 'none';
 }
 
