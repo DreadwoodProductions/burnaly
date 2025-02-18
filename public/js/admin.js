@@ -1,6 +1,55 @@
+// Debug configuration
+const DEBUG = {
+    enabled: false,
+    log: function(component, message, data = null) {
+        if (this.enabled) {
+            console.log(`[${component}] ${message}`, data || '');
+        }
+    },
+    error: function(component, message, error = null) {
+        if (this.enabled) {
+            console.error(`[${component}] ${message}`, error || '');
+        }
+    }
+};
+
 let charts = null;
 
+document.addEventListener('DOMContentLoaded', initializeAdmin);
+
+async function initializeAdmin() {
+    DEBUG.log('Init', 'Starting admin initialization');
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        DEBUG.log('Auth', 'No token found, showing login form');
+        showLoginForm();
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/verify', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            DEBUG.error('Auth', 'Token verification failed');
+            logout();
+            return;
+        }
+
+        DEBUG.log('Auth', 'Token verified successfully');
+        showAdminPanel();
+        initDashboard();
+    } catch (error) {
+        DEBUG.error('Auth', 'Session verification failed', error);
+        logout();
+    }
+}
+
 function initializeCharts() {
+    DEBUG.log('Charts', 'Initializing charts');
     const errorCtx = document.getElementById('errorChart').getContext('2d');
     const errorChart = new Chart(errorCtx, {
         type: 'line',
@@ -96,10 +145,12 @@ function initializeCharts() {
         }
     });
 
+    DEBUG.log('Charts', 'Charts initialized successfully');
     return { errorChart, executorChart };
 }
 
 async function checkKillswitchStatus() {
+    DEBUG.log('Killswitch', 'Checking status');
     try {
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'GET',
@@ -109,31 +160,32 @@ async function checkKillswitchStatus() {
         });
         
         if (response.status === 401) {
+            DEBUG.error('Killswitch', 'Unauthorized access');
             logout();
             return;
         }
 
         const data = await response.json();
-        // Convert string to boolean
         const status = data.status === true || data.status === 'true';
         
         const statusElement = document.getElementById('killswitchStatus');
         const indicator = document.getElementById('statusIndicator');
         
-        // Update UI based on boolean value
         indicator.className = `w-4 h-4 rounded-full mr-3 ${status ? 'bg-green-500' : 'bg-red-500'}`;
         statusElement.textContent = status ? 'Enabled' : 'Disabled';
         
         document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        DEBUG.log('Killswitch', 'Status updated successfully', { status });
         
         return status;
     } catch (error) {
-        console.error('Error in checkKillswitchStatus:', error);
+        DEBUG.error('Killswitch', 'Failed to check status', error);
         return null;
     }
 }
 
 async function setStatus(enabled) {
+    DEBUG.log('Killswitch', 'Setting status', { enabled });
     document.getElementById('loading').style.display = 'flex';
     
     try {
@@ -148,8 +200,6 @@ async function setStatus(enabled) {
         
         if (response.ok) {
             const data = await response.json();
-            
-            // Force immediate UI update
             const statusElement = document.getElementById('killswitchStatus');
             const indicator = document.getElementById('statusIndicator');
             
@@ -157,12 +207,11 @@ async function setStatus(enabled) {
             statusElement.textContent = enabled ? 'Enabled' : 'Disabled';
             
             showNotification(`Script has been successfully ${enabled ? 'enabled' : 'disabled'}`);
-            
-            // Update timestamp
             document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+            DEBUG.log('Killswitch', 'Status set successfully', { enabled });
         }
     } catch (error) {
-        console.error('Error in setStatus:', error);
+        DEBUG.error('Killswitch', 'Failed to set status', error);
         showNotification('Failed to update status');
     }
     
@@ -170,14 +219,15 @@ async function setStatus(enabled) {
 }
 
 async function updateDashboard() {
+    DEBUG.log('Dashboard', 'Starting dashboard update');
     try {
         const response = await fetch('/.netlify/functions/getlogs', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
-
         if (response.status === 401) {
+            DEBUG.error('Dashboard', 'Unauthorized access');
             logout();
             return;
         }
@@ -211,13 +261,14 @@ async function updateDashboard() {
 
         updateCharts(logs);
         updateTimeline(last24h.slice(0, 5));
-
+        DEBUG.log('Dashboard', 'Dashboard updated successfully');
     } catch (error) {
-        console.error('Failed to update dashboard:', error);
+        DEBUG.error('Dashboard', 'Failed to update dashboard', error);
     }
 }
 
 function updateCharts(logs) {
+    DEBUG.log('Charts', 'Updating charts');
     if (!charts) {
         charts = initializeCharts();
     }
@@ -243,9 +294,11 @@ function updateCharts(logs) {
     charts.executorChart.data.labels = Object.keys(executorCounts);
     charts.executorChart.data.datasets[0].data = Object.values(executorCounts);
     charts.executorChart.update();
+    DEBUG.log('Charts', 'Charts updated successfully');
 }
 
 function updateTimeline(recentLogs) {
+    DEBUG.log('Timeline', 'Updating timeline');
     const timeline = document.getElementById('timeline');
     timeline.innerHTML = recentLogs.map(log => `
         <div class="flex items-center space-x-4 p-4 bg-gray-700 bg-opacity-50 rounded-lg">
@@ -259,20 +312,12 @@ function updateTimeline(recentLogs) {
             </div>
         </div>
     `).join('');
-}
-
-function checkAuth() {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-        showLoginForm();
-        return false;
-    }
-    showAdminPanel();
-    return true;
+    DEBUG.log('Timeline', 'Timeline updated successfully');
 }
 
 async function handleLogin(event) {
     event.preventDefault();
+    DEBUG.log('Auth', 'Processing login');
     document.getElementById('loading').style.display = 'flex';
     
     const email = document.getElementById('email').value;
@@ -293,10 +338,13 @@ async function handleLogin(event) {
             showAdminPanel();
             showNotification('Login successful');
             initDashboard();
+            DEBUG.log('Auth', 'Login successful');
         } else {
+            DEBUG.error('Auth', 'Invalid credentials');
             showNotification('Invalid credentials');
         }
     } catch (error) {
+        DEBUG.error('Auth', 'Login failed', error);
         showNotification('Login failed');
     }
     
@@ -304,6 +352,7 @@ async function handleLogin(event) {
 }
 
 function logout() {
+    DEBUG.log('Auth', 'Logging out');
     localStorage.removeItem('adminToken');
     showLoginForm();
     showNotification('Logged out successfully');
@@ -331,13 +380,23 @@ function hideNotification() {
 }
 
 function initDashboard() {
+    DEBUG.log('Dashboard', 'Initializing dashboard');
     charts = initializeCharts();
     updateDashboard();
     checkKillswitchStatus();
+    
+    // Set up auto-refresh interval
     setInterval(() => {
         updateDashboard();
         checkKillswitchStatus();
     }, 30000);
 }
 
+// Toggle debug mode function
+function toggleDebug() {
+    DEBUG.enabled = !DEBUG.enabled;
+    console.log(`Debug mode ${DEBUG.enabled ? 'enabled' : 'disabled'}`);
+}
+
+// Initial setup
 checkAuth();
