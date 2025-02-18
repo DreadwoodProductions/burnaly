@@ -114,10 +114,18 @@ async function checkKillswitchStatus() {
         }
 
         const data = await response.json();
+        const statusElement = document.getElementById('killswitchStatus');
+        const indicator = document.getElementById('statusIndicator');
         
-        // Force immediate DOM updates
-        document.getElementById('killswitchStatus').textContent = data.status ? 'Enabled' : 'Disabled';
-        document.getElementById('statusIndicator').className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
+        // Clear any existing classes first
+        indicator.className = '';
+        // Add the base classes and the dynamic color class
+        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
+        
+        // Update the text content
+        statusElement.textContent = data.status ? 'Enabled' : 'Disabled';
+        
+        // Update timestamp
         document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
         
         return data.status;
