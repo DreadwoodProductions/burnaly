@@ -10,7 +10,11 @@ exports.handler = async (event) => {
   const method = event.httpMethod;
   
   if (method === 'GET') {
-    const status = await store.get('status') || false;
+    let status = await store.get('status');
+    if (status === null || status === undefined) {
+      status = true; // Set default to true
+      await store.set('status', true);
+    }
     return {
       statusCode: 200,
       headers: {
