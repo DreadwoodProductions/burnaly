@@ -1,26 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Kill Switch Admin</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <title>6Foot Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body style="background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
+<body class="bg-gray-900">
     <div id="loading">
         <div class="loader">
             <div class="text">Loading</div>
             <div class="load-inner load-one"></div>
             <div class="load-inner load-two"></div>
             <div class="load-inner load-three"></div>
-        </div>
-    </div>
-
-    <div class="warning" id="notification">
-        <div class="warning__icon">
-            <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m13 14h-2v-5h2zm0 4h-2v-2h2zm-12 3h22l-11-19z" fill="#393a37"></path></svg>
-        </div>
-        <div class="warning__title" id="notification-message"></div>
-        <div class="warning__close" onclick="hideNotification()">
-            <svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z" fill="#393a37"></path></svg>
         </div>
     </div>
 
@@ -47,16 +39,75 @@
         </form>
     </div>
 
-    <div id="adminPanel" style="display: none;">
-        <h2 style="color: white; margin-bottom: 20px;">Kill Switch Control Panel</h2>
-        <button onclick="setStatus(true)" class="admin-btn">Enable Script</button>
-        <button onclick="setStatus(false)" class="admin-btn">Disable Script</button>
-        <br>
-        <button onclick="window.location.href='/error-dashboard'" class="admin-btn">View Error Logs</button>
-        <br>
-        <button onclick="logout()" class="logout-btn">Logout</button>
+    <div id="adminPanel" class="container mx-auto px-4 py-8" style="display: none;">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Stat Cards -->
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-gray-400 text-sm font-medium">24h Errors</h3>
+                <p class="text-3xl font-bold text-white mt-2" id="totalErrors">0</p>
+                <div class="text-green-500 text-sm mt-2">+2.5% from yesterday</div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-gray-400 text-sm font-medium">Common Error</h3>
+                <p class="text-xl font-bold text-white mt-2" id="commonError">None</p>
+                <div class="text-sm text-gray-400 mt-2">Last 24 hours</div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-gray-400 text-sm font-medium">Most Affected Game</h3>
+                <p class="text-xl font-bold text-white mt-2" id="affectedGame">None</p>
+                <div class="text-sm text-gray-400 mt-2">Based on error count</div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-gray-400 text-sm font-medium">Killswitch Status</h3>
+                <div class="flex items-center mt-2">
+                    <div id="statusIndicator" class="w-3 h-3 rounded-full mr-2"></div>
+                    <p class="text-xl font-bold text-white" id="killswitchStatus">Checking...</p>
+                </div>
+                <div class="text-sm text-gray-400 mt-2">Last updated: <span id="lastUpdated">Just now</span></div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-white text-lg font-medium mb-4">Error Frequency</h3>
+                <canvas id="errorChart" height="300"></canvas>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                <h3 class="text-white text-lg font-medium mb-4">Executor Distribution</h3>
+                <canvas id="executorChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+            <h3 class="text-white text-lg font-medium mb-4">Error Timeline</h3>
+            <div class="space-y-4" id="timeline">
+                <!-- Timeline items will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="flex gap-4 mt-8">
+            <button onclick="setStatus(true)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Enable Script
+            </button>
+            <button onclick="setStatus(false)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Disable Script
+            </button>
+            <button onclick="window.location.href='/error-dashboard'" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                View Full Logs
+            </button>
+            <button onclick="logout()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Logout
+            </button>
+        </div>
     </div>
 
-    <script src="js/admin.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html>
