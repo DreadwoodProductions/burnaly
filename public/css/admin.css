@@ -272,48 +272,130 @@ body {
 /* Admin Panel */
 #adminPanel {
     width: 100%;
-    max-width: 400px;
+    max-width: 800px;
     margin: 2rem auto;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
+    padding: 2.5rem;
+    background: linear-gradient(
+        145deg,
+        rgba(37, 47, 63, 0.9) 0%,
+        rgba(48, 59, 76, 0.8) 100%
+    );
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.admin-header {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.admin-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .admin-btn {
-    background: linear-gradient(90deg, #243949 0%, #517fa4 100%);
-    color: white;
-    border: 2px solid #fff;
-    padding: 10px 20px;
-    margin: 10px;
+    background: linear-gradient(135deg, #2a4365 0%, #4a5568 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 6px;
-    font-family: monospace;
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .admin-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+    background: linear-gradient(135deg, #2d4a7c 0%, #546880 100%);
+}
+
+.admin-btn:active {
+    transform: translateY(-1px);
 }
 
 .logout-btn {
-    background: #ff4444;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
     color: white;
     border: none;
-    padding: 8px 16px;
-    margin-top: 20px;
+    padding: 0.875rem 2rem;
+    margin-top: 1.5rem;
     cursor: pointer;
-    border-radius: 6px;
-    font-family: monospace;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
+    text-transform: uppercase;
 }
 
 .logout-btn:hover {
-    background: #ff2020;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
 }
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.25rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 640px) {
+    #adminPanel {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .admin-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-header {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+}
+
 
 /* Loader */
 .loader {
