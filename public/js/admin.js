@@ -112,16 +112,23 @@ async function checkKillswitchStatus() {
             logout();
             return;
         }
-        const { status } = await response.json();
+
+        const data = await response.json();
         const statusElement = document.getElementById('killswitchStatus');
         const indicator = document.getElementById('statusIndicator');
         
-        statusElement.textContent = status ? 'Enabled' : 'Disabled';
-        indicator.className = `w-4 h-4 rounded-full mr-3 ${status ? 'bg-green-500' : 'bg-red-500'}`;
-        document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        // Force DOM update with the new status
+        statusElement.textContent = data.status ? 'Enabled' : 'Disabled';
+        indicator.className = `w-4 h-4 rounded-full mr-3 ${data.status ? 'bg-green-500' : 'bg-red-500'}`;
         
+        // Update timestamp
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+        
+        return data.status; // Return the status for other functions to use
     } catch (error) {
         console.error('Failed to fetch killswitch status:', error);
+        return null;
     }
 }
 
