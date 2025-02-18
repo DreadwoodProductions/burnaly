@@ -101,7 +101,8 @@ function initializeCharts() {
 
 async function checkKillswitchStatus() {
     try {
-        const response = await fetch('/.netlify/functions/getstatus', {
+        const response = await fetch('/.netlify/functions/killswitch', {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
@@ -111,7 +112,6 @@ async function checkKillswitchStatus() {
             logout();
             return;
         }
-
         const { status } = await response.json();
         const statusElement = document.getElementById('killswitchStatus');
         const indicator = document.getElementById('statusIndicator');
@@ -125,21 +125,21 @@ async function checkKillswitchStatus() {
     }
 }
 
-async function setStatus(enabled) {
+async function setStatus() {
     document.getElementById('loading').style.display = 'flex';
     
     try {
-        const response = await fetch('/.netlify/functions/setstatus', {
+        const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: enabled })
+            }
         });
-
+        
         if (response.ok) {
-            showNotification(`Script ${enabled ? 'enabled' : 'disabled'} successfully`);
+            const { status } = await response.json();
+            showNotification(`Script ${status ? 'enabled' : 'disabled'} successfully`);
             checkKillswitchStatus();
         } else {
             showNotification('Failed to update status');
