@@ -198,13 +198,22 @@ async function setStatus(enabled) {
     document.getElementById('loading').style.display = 'flex';
     
     try {
+        const timestamp = Math.floor(Date.now() / 1000);
+        const nonce = generateNonce();
+        
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 'x-admin-token': localStorage.getItem('adminToken'),
+                'x-client-signature': localStorage.getItem('adminToken'),
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ status: enabled })
+            body: JSON.stringify({ 
+                status: enabled,
+                timestamp: timestamp,
+                nonce: nonce
+            })
         });
         
         if (response.ok) {
