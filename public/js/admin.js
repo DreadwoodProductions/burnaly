@@ -197,14 +197,26 @@ async function setStatus(enabled) {
     DEBUG.log('Killswitch', 'Setting status', { enabled });
     document.getElementById('loading').style.display = 'flex';
     
-    const token = localStorage.getItem('adminToken');
-    
     try {
+        // First get the secure token from a protected endpoint
+        const authResponse = await fetch('/.netlify/functions/getAdminToken', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+        
+        if (!authResponse.ok) {
+            throw new Error('Failed to get admin access');
+        }
+        
+        const { token } = await authResponse.json();
+        
+        // Then use the token for the killswitch
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'x-admin-token': token
             },
             body: JSON.stringify({ status: enabled })
         });
