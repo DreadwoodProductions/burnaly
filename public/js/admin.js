@@ -197,14 +197,19 @@ async function setStatus(enabled) {
     DEBUG.log('Killswitch', 'Setting status', { enabled });
     document.getElementById('loading').style.display = 'flex';
     
+    const token = localStorage.getItem('adminToken');
+    
     try {
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                'Authorization': token
             },
-            body: JSON.stringify({ status: enabled })
+            body: JSON.stringify({ 
+                status: enabled,
+                token: token 
+            })
         });
         
         if (response.ok) {
