@@ -199,19 +199,18 @@ async function setStatus(enabled) {
     
     const timestamp = Math.floor(Date.now() / 1000);
     const nonce = generateNonce();
+    const token = localStorage.getItem('adminToken');
     
     try {
-        const response = await fetch(`/.netlify/functions/killswitch?nonce=${nonce}&timestamp=${timestamp}`, {
+        const response = await fetch(`/.netlify/functions/killswitch`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                'x-client-signature': localStorage.getItem('adminToken'),
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
                 status: enabled,
-                nonce: nonce,
-                timestamp: timestamp
+                token: token
             })
         });
         
@@ -238,6 +237,7 @@ async function setStatus(enabled) {
     
     document.getElementById('loading').style.display = 'none';
 }
+
 
 function generateNonce() {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
