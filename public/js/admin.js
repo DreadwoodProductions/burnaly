@@ -197,21 +197,14 @@ async function setStatus(enabled) {
     DEBUG.log('Killswitch', 'Setting status', { enabled });
     document.getElementById('loading').style.display = 'flex';
     
-    const timestamp = Math.floor(Date.now() / 1000);
-    const nonce = generateNonce();
-    const token = localStorage.getItem('adminToken');
-    
     try {
-        const response = await fetch(`/.netlify/functions/killswitch`, {
+        const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             },
-            body: JSON.stringify({ 
-                status: enabled,
-                token: token
-            })
+            body: JSON.stringify({ status: enabled })
         });
         
         if (response.ok) {
@@ -225,10 +218,6 @@ async function setStatus(enabled) {
             showNotification(`Script has been successfully ${enabled ? 'enabled' : 'disabled'}`);
             document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
             DEBUG.log('Killswitch', 'Status set successfully', { enabled });
-        } else {
-            const errorData = await response.json();
-            DEBUG.error('Killswitch', 'Server error', errorData);
-            showNotification(errorData.error || 'Failed to update status');
         }
     } catch (error) {
         DEBUG.error('Killswitch', 'Failed to set status', error);
@@ -237,7 +226,6 @@ async function setStatus(enabled) {
     
     document.getElementById('loading').style.display = 'none';
 }
-
 
 function generateNonce() {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
