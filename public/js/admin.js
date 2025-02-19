@@ -13,6 +13,15 @@ const DEBUG = {
     }
 };
 
+function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        showLoginForm();
+        return false;
+    }
+    return true;
+}
+
 let charts = null;
 
 document.addEventListener('DOMContentLoaded', initializeAdmin);
@@ -25,20 +34,17 @@ async function initializeAdmin() {
         showLoginForm();
         return;
     }
-
     try {
         const response = await fetch('/.netlify/functions/verify', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-
         if (!response.ok) {
             DEBUG.error('Auth', 'Token verification failed');
             logout();
             return;
         }
-
         DEBUG.log('Auth', 'Token verified successfully');
         showAdminPanel();
         initDashboard();
@@ -144,7 +150,6 @@ function initializeCharts() {
             }
         }
     });
-
     DEBUG.log('Charts', 'Charts initialized successfully');
     return { errorChart, executorChart };
 }
@@ -152,10 +157,14 @@ function initializeCharts() {
 async function checkKillswitchStatus() {
     DEBUG.log('Killswitch', 'Checking status');
     try {
-        const response = await fetch('/.netlify/functions/killswitch', {
+        const timestamp = Math.floor(Date.now() / 1000);
+        const nonce = generateNonce();
+        
+        const response = await fetch(`/.netlify/functions/killswitch?nonce=${nonce}&timestamp=${timestamp}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                'x-client-signature': localStorage.getItem('adminToken'),
+                'x-admin-token': localStorage.getItem('adminToken')
             }
         });
         
@@ -192,7 +201,7 @@ async function setStatus(enabled) {
         const response = await fetch('/.netlify/functions/killswitch', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                'x-admin-token': localStorage.getItem('adminToken'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ status: enabled })
@@ -218,6 +227,15 @@ async function setStatus(enabled) {
     document.getElementById('loading').style.display = 'none';
 }
 
+function generateNonce() {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let nonce = '';
+    for (let i = 0; i < 32; i++) {
+        nonce += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return nonce;
+}
+
 async function updateDashboard() {
     DEBUG.log('Dashboard', 'Starting dashboard update');
     try {
@@ -231,13 +249,11 @@ async function updateDashboard() {
             logout();
             return;
         }
-
         const logs = await response.json();
         
         const last24h = logs.filter(log => {
             return new Date(log.timestamp) > new Date(Date.now() - 24*60*60*1000);
         });
-
         document.getElementById('totalErrors').textContent = last24h.length;
         
         const errorTypes = {};
@@ -278,7 +294,6 @@ function updateCharts(logs) {
         const hour = new Date(log.timestamp).getHours();
         hourlyData[hour]++;
     });
-
     charts.errorChart.data.labels = Array.from({length: 24}, (_, i) => `${i}:00`);
     charts.errorChart.data.datasets[0].data = hourlyData;
     charts.errorChart.update();
@@ -290,7 +305,6 @@ function updateCharts(logs) {
             (log.executor || 'Unknown');
         executorCounts[executorName] = (executorCounts[executorName] || 0) + 1;
     });
-
     charts.executorChart.data.labels = Object.keys(executorCounts);
     charts.executorChart.data.datasets[0].data = Object.values(executorCounts);
     charts.executorChart.update();
@@ -322,7 +336,6 @@ async function handleLogin(event) {
     
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-
     try {
         const response = await fetch('/.netlify/functions/login', {
             method: 'POST',
@@ -331,7 +344,6 @@ async function handleLogin(event) {
             },
             body: JSON.stringify({ email, password })
         });
-
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('adminToken', data.token);
