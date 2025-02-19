@@ -204,12 +204,9 @@ async function setStatus(enabled) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': token
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ 
-                status: enabled,
-                token: token 
-            })
+            body: JSON.stringify({ status: enabled })
         });
         
         if (response.ok) {
