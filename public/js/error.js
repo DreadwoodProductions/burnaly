@@ -30,8 +30,30 @@ async function fetchErrorLogs() {
         const container = document.getElementById('error-cards');
         container.innerHTML = '';
         
-        logs.forEach((log, index) => {
+        for (const log of logs) {
             const card = template.content.cloneNode(true);
+            
+            // Fetch and set game thumbnail
+            if (log.gameId && log.gameId !== 'Unknown') {
+                try {
+                    const gameResponse = await fetch(`/.netlify/functions/getGameDetails?placeId=${log.gameId}`);
+                    const gameData = await gameResponse.json();
+                    
+                    if (gameData[0]?.universeId) {
+                        const thumbnailResponse = await fetch(`/.netlify/functions/getGameDetails/thumbnail?universeId=${gameData[0].universeId}`);
+                        const thumbnailData = await thumbnailResponse.json();
+                        
+                        const thumbnailUrl = thumbnailData.data?.[0]?.thumbnails?.[0]?.imageUrl;
+                        if (thumbnailUrl) {
+                            const gameThumb = card.querySelector('.game-thumbnail');
+                            gameThumb.src = thumbnailUrl;
+                            gameThumb.classList.remove('hidden');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch game thumbnail:', error);
+                }
+            }
             
             const gameLink = card.querySelector('.game-link');
             gameLink.href = `https://www.roblox.com/games/${log.gameId}`;
@@ -39,7 +61,6 @@ async function fetchErrorLogs() {
             
             card.querySelector('.game-id').textContent = `ID: ${log.gameId || 'N/A'}`;
             
-            // Handle executor object properly
             const executorName = typeof log.executor === 'object' ? 
                 (log.executor.name || 'Unknown') : 
                 (log.executor || 'Unknown');
@@ -47,13 +68,20 @@ async function fetchErrorLogs() {
             card.querySelector('.executor-name').textContent = executorName;
             
             const statusSpan = card.querySelector('.executor-status');
-            statusSpan.textContent = log.premium ? 'Premium' : 'Free';
-            statusSpan.classList.add(log.premium ? 'bg-purple-600' : 'bg-blue-600');
+            if (log.executor?.supported === false) {
+                statusSpan.textContent = 'Unsupported';
+                statusSpan.classList.add('bg-red-600');
+            } else if (log.executor?.isMacsploit) {
+                statusSpan.textContent = 'Macsploit';
+                statusSpan.classList.add('bg-purple-600');
+            } else {
+                statusSpan.textContent = 'Supported';
+                statusSpan.classList.add('bg-green-600');
+            }
             statusSpan.classList.add('text-white');
             
             card.querySelector('.error-message').textContent = log.error || 'No error message';
             
-            // Ensure valid timestamp
             const timestamp = log.timestamp ? new Date(log.timestamp) : new Date();
             const formattedTime = timestamp.toLocaleString('en-US', {
                 year: 'numeric',
@@ -65,12 +93,8 @@ async function fetchErrorLogs() {
             });
             card.querySelector('.timestamp').textContent = formattedTime;
             
-            const delay = index * 0.1;
-            const cardElement = card.querySelector('.bg-gray-800');
-            cardElement.style.animationDelay = `${delay}s`;
-            
             container.appendChild(card);
-        });
+        }
         
         document.getElementById('loading').style.display = 'none';
         
@@ -81,9 +105,7 @@ async function fetchErrorLogs() {
     }
 }
 
-// Check auth before initial load
 if (checkAuth()) {
     fetchErrorLogs();
-    // Refresh every 30 seconds if authenticated
     setInterval(fetchErrorLogs, 30000);
 }
