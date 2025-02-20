@@ -15,17 +15,16 @@
             <div class="load-inner load-three"></div>
         </div>
     </div>
-
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8 text-gray-100">6Foot Script Error Logs</h1>
         <div id="error-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Error cards will be inserted here -->
         </div>
     </div>
-
     <template id="error-card-template">
         <div class="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <div class="flex items-center mb-4">
+                <img class="game-thumbnail w-24 h-16 object-cover rounded hidden" src="" alt="Game Thumbnail">
                 <div class="ml-4">
                     <a href="" class="text-xl font-semibold text-blue-400 hover:text-blue-300 game-link"></a>
                     <p class="text-gray-400 game-id"></p>
@@ -46,7 +45,6 @@
             </div>
         </div>
     </template>
-
     <script src="js/error.js"></script>
 </body>
 </html>
