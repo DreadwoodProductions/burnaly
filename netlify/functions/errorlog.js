@@ -1,29 +1,10 @@
 const { getStore } = require('@netlify/blobs');
 const fetch = require('node-fetch');
 
-// This should be in your errorlog.js Netlify function
 async function getGameDetails(placeId) {
-    const response = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    return response.json();
-}
-
-async function getGameThumbnail(placeId) {
-    // Step 1: Convert PlaceID to UniverseID
-    const placeDetailsResponse = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`);
-    const placeDetails = await placeDetailsResponse.json();
-    
-    if (!placeDetails[0]?.universeId) return null;
-    
-    // Step 2: Get thumbnail using UniverseID
-    const universeId = placeDetails[0].universeId;
-    const thumbnailResponse = await fetch(`https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&size=768x432&format=Png&isCircular=false`);
-    const thumbnailData = await thumbnailResponse.json();
-    
-    return thumbnailData.data[0]?.thumbnails[0]?.imageUrl || null;
+    const response = await fetch(`/.netlify/functions/getGameDetails?placeId=${placeId}`);
+    const data = await response.json();
+    return data;
 }
 
 exports.handler = async (event, context) => {
@@ -38,9 +19,16 @@ exports.handler = async (event, context) => {
             const timestamp = new Date().toISOString();
             const errorData = JSON.parse(event.body);
             
+            let gameDetails = null;
             let thumbnailUrl = null;
+            
             if (errorData.game?.id) {
-                thumbnailUrl = await getGameThumbnail(errorData.game.id);
+                gameDetails = await getGameDetails(errorData.game.id);
+                if (gameDetails[0]?.universeId) {
+                    const thumbnailResponse = await fetch(`/.netlify/functions/getGameDetails/thumbnail?universeId=${gameDetails[0].universeId}`);
+                    const thumbnailData = await thumbnailResponse.json();
+                    thumbnailUrl = thumbnailData.data[0]?.thumbnails[0]?.imageUrl;
+                }
             }
 
             const formattedData = {
@@ -48,6 +36,7 @@ exports.handler = async (event, context) => {
                 gameId: errorData.game?.id || 'Unknown',
                 gameName: errorData.game?.name || 'Unknown Game',
                 gameThumbnail: thumbnailUrl,
+                universeId: gameDetails?.[0]?.universeId,
                 player: {
                     name: errorData.player?.name || 'Unknown',
                     displayName: errorData.player?.displayName || 'Unknown',
