@@ -1,6 +1,16 @@
 const { getStore } = require('@netlify/blobs');
 const fetch = require('node-fetch');
 
+// This should be in your errorlog.js Netlify function
+async function getGameDetails(placeId) {
+    const response = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    return response.json();
+}
+
 async function getGameThumbnail(placeId) {
     // Step 1: Convert PlaceID to UniverseID
     const placeDetailsResponse = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`);
