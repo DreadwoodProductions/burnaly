@@ -23,9 +23,7 @@ async function fetchErrorLogs() {
             return;
         }
 
-        const data = await response.json();
-        const logs = Array.isArray(data) ? data : [];
-        
+        const logs = await response.json();
         const template = document.getElementById('error-card-template');
         const container = document.getElementById('error-cards');
         container.innerHTML = '';
@@ -33,42 +31,26 @@ async function fetchErrorLogs() {
         for (const log of logs) {
             const card = template.content.cloneNode(true);
             
-            // Fetch and set game thumbnail
-            if (log.gameId && log.gameId !== 'Unknown') {
-                try {
-                    const gameResponse = await fetch(`/.netlify/functions/getGameDetails?placeId=${log.gameId}`);
-                    const gameData = await gameResponse.json();
-                    
-                    if (gameData[0]?.universeId) {
-                        const thumbnailResponse = await fetch(`/.netlify/functions/getGameDetails/thumbnail?universeId=${gameData[0].universeId}`);
-                        const thumbnailData = await thumbnailResponse.json();
-                        
-                        const thumbnailUrl = thumbnailData.data?.[0]?.thumbnails?.[0]?.imageUrl;
-                        if (thumbnailUrl) {
-                            const gameThumb = card.querySelector('.game-thumbnail');
-                            gameThumb.src = thumbnailUrl;
-                            gameThumb.classList.remove('hidden');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch game thumbnail:', error);
-                }
+            // Set game thumbnail if available
+            if (log.game?.thumbnail) {
+                const gameThumb = card.querySelector('.game-thumbnail');
+                gameThumb.src = log.game.thumbnail;
+                gameThumb.classList.remove('hidden');
             }
             
+            // Set game information
             const gameLink = card.querySelector('.game-link');
-            gameLink.href = `https://www.roblox.com/games/${log.gameId}`;
-            gameLink.textContent = log.gameName || 'Unnamed Game';
+            gameLink.href = `https://www.roblox.com/games/${log.game?.id}`;
+            gameLink.textContent = log.game?.name || 'Unnamed Game';
+            card.querySelector('.game-id').textContent = `ID: ${log.game?.id || 'N/A'}`;
             
-            card.querySelector('.game-id').textContent = `ID: ${log.gameId || 'N/A'}`;
-            
-            const executorName = typeof log.executor === 'object' ? 
-                (log.executor.name || 'Unknown') : 
-                (log.executor || 'Unknown');
-            
+            // Set executor information
+            const executorName = log.executor?.name || 'Unknown';
             card.querySelector('.executor-name').textContent = executorName;
             
+            // Set executor status
             const statusSpan = card.querySelector('.executor-status');
-            if (log.executor?.supported === false) {
+            if (!log.executor?.supported) {
                 statusSpan.textContent = 'Unsupported';
                 statusSpan.classList.add('bg-red-600');
             } else if (log.executor?.isMacsploit) {
@@ -80,9 +62,10 @@ async function fetchErrorLogs() {
             }
             statusSpan.classList.add('text-white');
             
+            // Set error message and timestamp
             card.querySelector('.error-message').textContent = log.error || 'No error message';
             
-            const timestamp = log.timestamp ? new Date(log.timestamp) : new Date();
+            const timestamp = new Date(log.timestamp);
             const formattedTime = timestamp.toLocaleString('en-US', {
                 year: 'numeric',
                 month: 'short',
