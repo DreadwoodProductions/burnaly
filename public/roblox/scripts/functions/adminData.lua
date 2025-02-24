@@ -131,8 +131,10 @@ end
 spawn(function()
     while task.wait(5) do
         if not checkKillSwitch() then
-            game.Players.LocalPlayer:Kick("Server has been disabled until further notice.")
+            game.Players.LocalPlayer:Kick("Server has been disabled until further notice!")
             break
         end
     end
 end)
+
+return LogError
