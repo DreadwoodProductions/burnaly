@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Save Data Viewer</title>
+    <style>
+        .save-container {
+            padding: 20px;
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Save Data Viewer</h1>
+    <input type="text" id="userId" placeholder="Enter User ID">
+    <button onclick="loadSaveData()">Load Data</button>
+    <div id="saveData"></div>
+
+    <script>
+        async function loadSaveData() {
+            const userId = document.getElementById('userId').value;
+            const response = await fetch(`/.netlify/functions/getSaveData?userId=${userId}`);
+            const data = await response.json();
+            
+            const container = document.getElementById('saveData');
+            container.innerHTML = '';
+            
+            data.forEach(save => {
+                const div = document.createElement('div');
+                div.className = 'save-container';
+                div.innerHTML = `
+                    <div class="timestamp">${save.timestamp}</div>
+                    <pre>${JSON.stringify(save.saveData, null, 2)}</pre>
+                `;
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
