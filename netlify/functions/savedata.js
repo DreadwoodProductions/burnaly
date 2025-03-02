@@ -19,7 +19,6 @@ exports.handler = async (event) => {
         const timestamp = Date.now();
         const fileName = `${userId}_${timestamp}.json`;
         
-        // Store in a dedicated directory for each user
         const userDir = path.join('userData', userId.toString());
         await fs.mkdir(userDir, { recursive: true });
         
