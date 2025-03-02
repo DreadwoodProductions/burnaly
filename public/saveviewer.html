@@ -12,32 +12,47 @@
             color: #666;
             font-size: 0.9em;
         }
+        .message {
+            color: red;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Save Data Viewer</h1>
     <input type="text" id="userId" placeholder="Enter User ID">
     <button onclick="loadSaveData()">Load Data</button>
+    <div id="message"></div>
     <div id="saveData"></div>
 
     <script>
         async function loadSaveData() {
             const userId = document.getElementById('userId').value;
-            const response = await fetch(`/.netlify/functions/getSaveData?userId=${userId}`);
-            const data = await response.json();
-            
+            const messageDiv = document.getElementById('message');
             const container = document.getElementById('saveData');
-            container.innerHTML = '';
             
-            data.forEach(save => {
-                const div = document.createElement('div');
-                div.className = 'save-container';
-                div.innerHTML = `
-                    <div class="timestamp">${save.timestamp}</div>
-                    <pre>${JSON.stringify(save.saveData, null, 2)}</pre>
-                `;
-                container.appendChild(div);
-            });
+            try {
+                const response = await fetch(`/.netlify/functions/getSaveData?userId=${userId}`);
+                const result = await response.json();
+                
+                container.innerHTML = '';
+                messageDiv.innerHTML = result.message || '';
+                
+                if (result.data && Array.isArray(result.data)) {
+                    result.data.forEach(save => {
+                        const div = document.createElement('div');
+                        div.className = 'save-container';
+                        div.innerHTML = `
+                            <div class="timestamp">${save.timestamp}</div>
+                            <pre>${JSON.stringify(save.saveData, null, 2)}</pre>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            } catch (error) {
+                messageDiv.innerHTML = 'Error loading data';
+                container.innerHTML = '';
+            }
         }
     </script>
 </body>
