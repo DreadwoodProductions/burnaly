@@ -159,14 +159,11 @@ class ExecutorApp {
             { condition: details.community, icon: 'fa-users', label: 'Community' },
             { condition: details.external, icon: 'fa-external-link', label: 'External' }
         ];
-
+    
         return features
             .filter(feature => feature.condition)
             .map(feature => `
-                <div class="feature-badge">
-                    <i class="fa-solid ${feature.icon}" title="${feature.label}"></i>
-                    <span>${feature.label}</span>
-                </div>
+                <i class="fa-solid ${feature.icon}" data-tooltip="${feature.label}"></i>
             `).join('');
     }
 
