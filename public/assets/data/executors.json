@@ -1,0 +1,424 @@
+{
+    "executors": [
+        {
+            "name": "Apple-Ware",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://appleware.dev/",
+                "discordInvite": "https://discord.com/invite/appleware"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": true,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Arceus X",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://spdmteam.com/index",
+                "discordInvite": "https://discord.com/invite/arceus"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Atlantis",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://getatlantis.xyz/Atlantis.zip",
+                "discordInvite": "https://discord.gg/theatlantis"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "AWP",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://burnaly.com/error/download/awp",
+                "discordInvite": "https://discord.com/invite/awpgg"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Codex",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://codex.lol/",
+                "discordInvite": "https://discord.gg/robloxexploits"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Cryptic",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://getcryptic.net/",
+                "discordInvite": "https://discord.gg/getcryptic"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Delta",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://deltaexploits.gg/",
+                "discordInvite": "https://discord.gg/deltaex"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": true,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Fluxus",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": true,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://www.mediafire.com/file/i5eu04ay3uf28dh/NEW+FLUXUS+WORKING.apk/file",
+                "discordInvite": "https://discord.gg/silentcaliber"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Hydrogen",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://burnaly.com/error/download/hydrogen",
+                "discordInvite": "https://discord.gg/hydrogen-924722337981530132"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": true,
+                "Windows": false
+            }
+        },
+        {
+            "name": "JJSploit",
+            "details": {
+                "supported": false,
+                "level": 3,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://wearedevs.net/dInfo/JJSploit",
+                "discordInvite": "https://burnaly.com/error/discord/jjsploit"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Luna",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": true
+            },
+            "links": {
+                "download": "https://github.com/suffz/luna/raw/refs/heads/main/Bootstrapper.zip",
+                "discordInvite": "https://discord.gg/getluna"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Macsploit",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://burnaly.com/error/download/macsploit",
+                "discordInvite": "https://discord.gg/macsploit"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": true,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Nihon",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://nihon.lol/",
+                "discordInvite": "https://discord.gg/nihon"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Seliware",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://burnaly.com/error/dowload/seliware",
+                "discordInvite": "https://discord.gg/zovware"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Solara V3",
+            "details": {
+                "supported": false,
+                "level": 3,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://getsolara.dev/",
+                "discordInvite": "https://burnaly.com/error/discord/solara v3"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Synapse Z",
+            "details": {
+                "supported": null,
+                "level": 8,
+                "community": false,
+                "key": false,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://synapsez.net/",
+                "discordInvite": "https://discord.com/invite/syn-x"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Vega X",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://www.vegax.gg/",
+                "discordInvite": "https://discord.com/invite/vegax"
+            },
+            "devices": {
+                "Android": true,
+                "iOS": false,
+                "Mac": false,
+                "Windows": false
+            }
+        },
+        {
+            "name": "Wave",
+            "details": {
+                "supported": true,
+                "level": 8,
+                "community": false,
+                "key": true,
+                "paid": true,
+                "external": false
+            },
+            "links": {
+                "download": "https://getwave.gg/",
+                "discordInvite": "https://burnaly.com/error/discord/wave"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Xeno",
+            "details": {
+                "supported": false,
+                "level": 3,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://github.com/Riz-ve/Xeno",
+                "discordInvite": "https://discord.gg/getxeno"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        },
+        {
+            "name": "Zorara",
+            "details": {
+                "supported": false,
+                "level": 3,
+                "community": false,
+                "key": false,
+                "paid": false,
+                "external": false
+            },
+            "links": {
+                "download": "https://getzorara.online/",
+                "discordInvite": "https://discord.gg/realzorara"
+            },
+            "devices": {
+                "Android": false,
+                "iOS": false,
+                "Mac": false,
+                "Windows": true
+            }
+        }
+    ]
+}
