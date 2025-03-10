@@ -94,6 +94,96 @@ class ExecutorApp {
         }
     }
 
+    renderExecutors(executors) {
+        const container = document.querySelector(this.SELECTORS.cardsContainer);
+        container.innerHTML = executors.map((executor, index) => this.createExecutorCard(executor, index)).join('');
+        this.addCardAnimations();
+    }
+
+    createExecutorCard(executor, index) {
+        const platforms = Object.keys(executor.devices).filter(platform => executor.devices[platform]).join(' ');
+        const price = executor.details.paid ? 'paid' : 'free';
+        const support = executor.details.supported ? 'supported' : 'unsupported';
+
+        return `
+            <div class="card" 
+                 style="--card-index: ${index}"
+                 data-platform="${platforms}"
+                 data-level="${executor.details.level}"
+                 data-price="${price}"
+                 data-support="${support}">
+                <div class="card-header">
+                    <h3>${executor.name}</h3>
+                    <div class="feature-badges">
+                        ${this.createFeatureIcons(executor.details)}
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="info-section">
+                        <div class="level">Level ${executor.details.level}</div>
+                        <div class="status-badge ${support}">
+                            <i class="fas fa-circle"></i>
+                            ${support.charAt(0).toUpperCase() + support.slice(1)}
+                        </div>
+                    </div>
+                    <div class="platforms">
+                        ${this.createPlatformIcons(executor.devices)}
+                    </div>
+                </div>
+                <div class="buttons">
+                    <a href="${executor.links.download}" target="_blank" class="download-btn">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <a href="${executor.links.discordInvite}" target="_blank" class="discord-btn">
+                        <i class="fab fa-discord"></i> Discord
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+
+    displayErrorState() {
+        const container = document.querySelector(this.SELECTORS.cardsContainer);
+        container.innerHTML = `
+            <div class="error-message">
+                <h2>Unable to load executors</h2>
+                <p>Please try refreshing the page</p>
+            </div>
+        `;
+    }
+
+    createFeatureIcons(details) {
+        const features = [
+            { condition: details.paid, icon: 'fa-credit-card', label: 'Paid' },
+            { condition: details.key, icon: 'fa-key', label: 'Key' },
+            { condition: details.community, icon: 'fa-users', label: 'Community' },
+            { condition: details.external, icon: 'fa-external-link', label: 'External' }
+        ];
+
+        return features
+            .filter(feature => feature.condition)
+            .map(feature => `
+                <div class="feature-badge">
+                    <i class="fa-solid ${feature.icon}" title="${feature.label}"></i>
+                    <span>${feature.label}</span>
+                </div>
+            `).join('');
+    }
+
+    createPlatformIcons(devices) {
+        const platforms = [
+            { name: 'Windows', icon: 'fa-windows', condition: devices.Windows },
+            { name: 'Mac', icon: 'fa-apple', condition: devices.Mac },
+            { name: 'Android', icon: 'fa-android', condition: devices.Android },
+            { name: 'iOS', icon: 'fa-mobile-screen', condition: devices.iOS }
+        ];
+
+        return platforms.map(platform => `
+            <i class="fa-brands ${platform.icon} ${platform.condition ? 'active' : 'inactive'}" 
+               title="${platform.name}"></i>
+        `).join('');
+    }
+
     setupEventListeners() {
         document.querySelector(this.SELECTORS.searchInput)
             .addEventListener(this.EVENTS.INPUT, this.handleSearch.bind(this));
@@ -145,6 +235,20 @@ class ExecutorApp {
         });
     }
 
+    checkCardAgainstFilters(card) {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const platforms = card.dataset.platform.toLowerCase();
+        const { level, price, support } = card.dataset;
+
+        const { search, platform, level: filterLevel, price: filterPrice, support: filterSupport } = this.filterState;
+
+        return (!search || title.includes(search.toLowerCase())) &&
+               (platform === this.FILTER_VALUES.ALL || platforms.includes(platform)) &&
+               (filterLevel === this.FILTER_VALUES.ALL || level === filterLevel) &&
+               (filterPrice === this.FILTER_VALUES.ALL || price === filterPrice) &&
+               (filterSupport === this.FILTER_VALUES.ALL || support === filterSupport);
+    }
+
     setupIntersectionObserver() {
         const observer = new IntersectionObserver(
             this.handleIntersection.bind(this),
@@ -161,6 +265,41 @@ class ExecutorApp {
                 entry.target.classList.add('animate');
                 observer.unobserve(entry.target);
             }
+        });
+    }
+
+    addCardAnimations() {
+        const cards = document.querySelectorAll(this.SELECTORS.card);
+        cards.forEach((card, index) => {
+            card.style.setProperty('--card-index', index);
+            this.addFeatureIconAnimations(card);
+            this.addButtonAnimations(card);
+        });
+    }
+
+    addFeatureIconAnimations(card) {
+        const features = card.querySelectorAll('.feature-badges i');
+        features.forEach(icon => {
+            icon.addEventListener(this.EVENTS.MOUSEOVER, () => {
+                icon.style.transform = 'scale(1.2) rotate(8deg)';
+            });
+
+            icon.addEventListener(this.EVENTS.MOUSEOUT, () => {
+                icon.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    }
+
+    addButtonAnimations(card) {
+        const buttons = card.querySelectorAll(this.SELECTORS.buttons);
+        buttons.forEach(button => {
+            button.addEventListener(this.EVENTS.MOUSEOVER, () => {
+                button.style.transform = 'translateY(-2px)';
+            });
+
+            button.addEventListener(this.EVENTS.MOUSEOUT, () => {
+                button.style.transform = 'translateY(0)';
+            });
         });
     }
 
