@@ -104,7 +104,7 @@ class ExecutorApp {
         const platforms = Object.keys(executor.devices).filter(platform => executor.devices[platform]).join(' ');
         const price = executor.details.paid ? 'paid' : 'free';
         const support = executor.details.supported ? 'supported' : 'unsupported';
-        const iconPath = `assets/executor-icons/${executor.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+        // const iconPath = `assets/executor-icons/${executor.name.toLowerCase().replace(/\s+/g, '-')}.png`;
     
         return `
             <div class="card" 
@@ -114,7 +114,7 @@ class ExecutorApp {
                  data-price="${price}"
                  data-support="${support}">
                 <div class="card-header">
-                    <img src="${iconPath}" alt="${executor.name}" class="executor-icon">
+                    <!-- <img src="${iconPath}" alt="${executor.name}" class="executor-icon"> -->
                     <h3>${executor.name}</h3>
                     <div class="feature-badges">
                         ${this.createFeatureIcons(executor.details)}
