@@ -101,8 +101,11 @@ class ExecutorApp {
     }
 
     createExecutorCard(executor, index) {
+        const platforms = Object.keys(executor.devices).filter(platform => executor.devices[platform]).join(' ');
+        const price = executor.details.paid ? 'paid' : 'free';
+        const support = executor.details.supported ? 'supported' : 'unsupported';
         const iconPath = `assets/executor-icons/${executor.name.toLowerCase().replace(/\s+/g, '-')}.png`;
-        
+    
         return `
             <div class="card" 
                  style="--card-index: ${index}"
