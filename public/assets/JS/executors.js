@@ -55,6 +55,7 @@ class ExecutorApp {
         this.setupIntersectionObserver();
         this.addCopyFeature();
         this.addPlatformDetails();
+        this.addGlitchEffects(); 
     }
 
     createLoadingState() {
@@ -104,7 +105,7 @@ class ExecutorApp {
         const platforms = Object.keys(executor.devices).filter(platform => executor.devices[platform]).join(' ');
         const price = executor.details.paid ? 'paid' : 'free';
         const support = executor.details.supported ? 'supported' : 'unsupported';
-    
+
         return `
             <div class="card" 
                  style="--card-index: ${index}"
@@ -113,17 +114,17 @@ class ExecutorApp {
                  data-price="${price}"
                  data-support="${support}">
                 <div class="card-header">
-                    <h3>${executor.name}</h3>
+                    <h3 class="glitch-on-hover">${executor.name}</h3>
                     <div class="feature-badges">
                         ${this.createFeatureIcons(executor.details)}
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="info-section">
-                        <div class="level">Level ${executor.details.level}</div>
+                    <div class="info-section glitch-element">
+                        <div class="level flicker-text">Level ${executor.details.level}</div>
                         <div class="status-badge ${support}">
                             <i class="fas fa-circle"></i>
-                            ${support.charAt(0).toUpperCase() + support.slice(1)}
+                            <span class="glitch-on-hover">${support.charAt(0).toUpperCase() + support.slice(1)}</span>
                         </div>
                     </div>
                     <div class="platforms">
@@ -131,10 +132,10 @@ class ExecutorApp {
                     </div>
                 </div>
                 <div class="buttons">
-                    <a href="${executor.links.download}" target="_blank" class="download-btn">
+                    <a href="${executor.links.download}" target="_blank" class="download-btn glitch-on-hover">
                         <i class="fas fa-download"></i> Download
                     </a>
-                    <a href="${executor.links.discordInvite}" target="_blank" class="discord-btn">
+                    <a href="${executor.links.discordInvite}" target="_blank" class="discord-btn glitch-on-hover">
                         <i class="fab fa-discord"></i> Discord
                     </a>
                 </div>
@@ -146,8 +147,8 @@ class ExecutorApp {
         const container = document.querySelector(this.SELECTORS.cardsContainer);
         container.innerHTML = `
             <div class="error-message">
-                <h2>Unable to load executors</h2>
-                <p>Please try refreshing the page</p>
+                <h2 class="glitch-on-hover">Unable to load executors</h2>
+                <p class="flicker-text">Please try refreshing the page</p>
             </div>
         `;
     }
@@ -159,7 +160,7 @@ class ExecutorApp {
             { condition: details.community, icon: 'fa-users', label: 'Community' },
             { condition: details.external, icon: 'fa-external-link', label: 'External' }
         ];
-    
+
         return features
             .filter(feature => feature.condition)
             .map(feature => `
@@ -333,5 +334,31 @@ class ExecutorApp {
                 `${platformName}: ${isActive ? 'Supported' : 'Not Supported'}`
             );
         });
+    }
+
+    addGlitchEffects() {
+
+        const siteTitle = document.querySelector('header h1.neonText');
+        if (siteTitle) {
+            siteTitle.classList.add('glitch-on-hover');
+
+            setInterval(() => {
+                siteTitle.classList.add('active-glitch');
+                setTimeout(() => {
+                    siteTitle.classList.remove('active-glitch');
+                }, 2000);
+            }, 8000);
+        }
+
+        const glitchElements = document.querySelectorAll('.glitch-on-hover');
+        setInterval(() => {
+            const randomElement = glitchElements[Math.floor(Math.random() * glitchElements.length)];
+            if (randomElement) {
+                randomElement.classList.add('active-glitch');
+                setTimeout(() => {
+                    randomElement.classList.remove('active-glitch');
+                }, 1500);
+            }
+        }, 5000);
     }
 }
