@@ -55,7 +55,7 @@ class ExecutorApp {
         this.setupIntersectionObserver();
         this.addCopyFeature();
         this.addPlatformDetails();
-        this.addGlitchEffects();
+        this.addGlitchEffects(); 
     }
 
     createLoadingState() {
@@ -132,10 +132,10 @@ class ExecutorApp {
                     </div>
                 </div>
                 <div class="buttons">
-                    <a href="${executor.links.download}" target="_blank" class="download-btn">
+                    <a href="${executor.links.download}" target="_blank" class="download-btn glitch-on-hover">
                         <i class="fas fa-download"></i> Download
                     </a>
-                    <a href="${executor.links.discordInvite}" target="_blank" class="discord-btn">
+                    <a href="${executor.links.discordInvite}" target="_blank" class="discord-btn glitch-on-hover">
                         <i class="fab fa-discord"></i> Discord
                     </a>
                 </div>
@@ -163,56 +163,52 @@ class ExecutorApp {
 
         return features
             .filter(feature => feature.condition)
-            .map(feature => `<i class="fas ${feature.icon}" title="${feature.label}"></i>`)
-            .join('');
+            .map(feature => `
+                <i class="fa-solid ${feature.icon}" data-tooltip="${feature.label}"></i>
+            `).join('');
     }
 
     createPlatformIcons(devices) {
         const platforms = [
-            { platform: 'windows', icon: 'fab fa-windows', label: 'Windows' },
-            { platform: 'mac', icon: 'fab fa-apple', label: 'Mac' },
-            { platform: 'android', icon: 'fab fa-android', label: 'Android' },
-            { platform: 'ios', icon: 'fab fa-app-store-ios', label: 'iOS' }
+            { name: 'Windows', icon: 'fa-windows', condition: devices.Windows },
+            { name: 'Mac', icon: 'fa-apple', condition: devices.Mac },
+            { name: 'Android', icon: 'fa-android', condition: devices.Android },
+            { name: 'iOS', icon: 'fa-mobile-screen', condition: devices.iOS }
         ];
 
-        return platforms
-            .filter(platform => devices[platform.platform])
-            .map(platform => `<i class="${platform.icon}" title="${platform.label}"></i>`)
-            .join('');
+        return platforms.map(platform => `
+            <i class="fa-brands ${platform.icon} ${platform.condition ? 'active' : 'inactive'}" 
+               title="${platform.name}"></i>
+        `).join('');
     }
 
     setupEventListeners() {
-        document.querySelector(this.SELECTORS.searchInput).addEventListener(this.EVENTS.INPUT, this.handleSearch.bind(this));
-        Object.entries(this.SELECTORS.filters).forEach(([filter, selector]) => {
-            if (filter !== 'reset') {
-                document.querySelector(selector).addEventListener(this.EVENTS.CHANGE, (event) => {
-                    this.handleFilterChange(filter, event);
-                });
-            } else {
-                document.querySelector(selector).addEventListener(this.EVENTS.CLICK, this.resetFilters.bind(this));
+        document.querySelector(this.SELECTORS.searchInput)
+            .addEventListener(this.EVENTS.INPUT, this.handleSearch.bind(this));
+
+        Object.values(this.SELECTORS.filters).forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.addEventListener(this.EVENTS.CHANGE, this.handleFilterChange.bind(this));
             }
         });
+
+        document.querySelector(this.SELECTORS.filters.reset)
+            .addEventListener(this.EVENTS.CLICK, this.resetFilters.bind(this));
     }
 
     handleSearch(event) {
-        this.filterState.search = event.target.value.toLowerCase();
+        this.filterState.search = event.target.value.trim();
         this.applyFilters();
     }
 
-    handleFilterChange(filter, event) {
-        this.filterState[filter] = event.target.value;
+    handleFilterChange(event) {
+        const filterKey = event.target.id.split('-')[0];
+        this.filterState[filterKey] = event.target.value;
         this.applyFilters();
     }
 
     resetFilters() {
-        Object.values(this.SELECTORS.filters).forEach(selector => {
-            if (selector !== this.SELECTORS.searchInput) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.value = this.FILTER_VALUES.ALL;
-                }
-            }
-        });
         this.filterState = {
             search: '',
             platform: this.FILTER_VALUES.ALL,
@@ -220,37 +216,51 @@ class ExecutorApp {
             price: this.FILTER_VALUES.ALL,
             support: this.FILTER_VALUES.ALL
         };
+
         document.querySelector(this.SELECTORS.searchInput).value = '';
+        document.querySelectorAll('select')
+            .forEach(select => select.value = this.FILTER_VALUES.ALL);
+
         this.applyFilters();
     }
 
     applyFilters() {
-        const cards = Array.from(document.querySelectorAll(this.SELECTORS.card));
-        cards.forEach(card => {
-            const matchesSearch = card.textContent.toLowerCase().includes(this.filterState.search);
-            const matchesPlatform = this.filterState.platform === this.FILTER_VALUES.ALL || card.dataset.platform.includes(this.filterState.platform);
-            const matchesLevel = this.filterState.level === this.FILTER_VALUES.ALL || card.dataset.level === this.filterState.level;
-            const matchesPrice = this.filterState.price === this.FILTER_VALUES.ALL || card.dataset.price === this.filterState.price;
-            const matchesSupport = this.filterState.support === this.FILTER_VALUES.ALL || card.dataset.support === this.filterState.support;
-
-            if (matchesSearch && matchesPlatform && matchesLevel && matchesPrice && matchesSupport) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+        document.querySelectorAll(this.SELECTORS.card).forEach(card => {
+            const isVisible = this.checkCardAgainstFilters(card);
+            card.style.display = isVisible ? '' : 'none';
+            card.style.opacity = isVisible ? '1' : '0';
+            card.style.visibility = isVisible ? 'visible' : 'hidden';
         });
     }
 
+    checkCardAgainstFilters(card) {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const platforms = card.dataset.platform.toLowerCase();
+        const { level, price, support } = card.dataset;
+
+        const { search, platform, level: filterLevel, price: filterPrice, support: filterSupport } = this.filterState;
+
+        return (!search || title.includes(search.toLowerCase())) &&
+               (platform === this.FILTER_VALUES.ALL || platforms.includes(platform)) &&
+               (filterLevel === this.FILTER_VALUES.ALL || level === filterLevel) &&
+               (filterPrice === this.FILTER_VALUES.ALL || price === filterPrice) &&
+               (filterSupport === this.FILTER_VALUES.ALL || support === filterSupport);
+    }
+
     setupIntersectionObserver() {
-        const cards = document.querySelectorAll(this.SELECTORS.card);
-        const observer = new IntersectionObserver(this.handleIntersection.bind(this), this.observerOptions);
-        cards.forEach(card => observer.observe(card));
+        const observer = new IntersectionObserver(
+            this.handleIntersection.bind(this),
+            this.observerOptions
+        );
+
+        document.querySelectorAll(this.SELECTORS.card)
+            .forEach(card => observer.observe(card));
     }
 
     handleIntersection(entries, observer) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('in-view');
+                entry.target.classList.add('animate');
                 observer.unobserve(entry.target);
             }
         });
@@ -258,65 +268,97 @@ class ExecutorApp {
 
     addCardAnimations() {
         const cards = document.querySelectorAll(this.SELECTORS.card);
-        cards.forEach(this.animateCard.bind(this));
-    }
-
-    animateCard(card, index) {
-        const delay = index * 0.1;
-        card.style.animationDelay = `${delay}s`;
-    }
-
-    addCopyFeature() {
-        document.body.addEventListener(this.EVENTS.CLICK, (event) => {
-            if (event.target.classList.contains('fa-external-link')) {
-                const link = event.target.closest('a');
-                if (link) {
-                    navigator.clipboard.writeText(link.href).then(() => {
-                        console.log('Link copied to clipboard');
-                    }).catch(err => {
-                        console.error('Failed to copy link: ', err);
-                    });
-                }
-            }
-        });
-    }
-
-    addPlatformDetails() {
-        document.body.addEventListener(this.EVENTS.MOUSEOVER, (event) => {
-            if (event.target.matches(this.SELECTORS.platformIcons)) {
-                const platform = event.target.title;
-                console.log(`Platform: ${platform}`);
-            }
-        });
-    }
-
-    addGlitchEffects() {
-        const title = document.querySelector('h1.neonText.glitch-on-hover');
-        if (title) {
-            setInterval(() => {
-                title.classList.toggle('active-glitch');
-            }, 5000);
-        }
-
-        const cards = document.querySelectorAll(this.SELECTORS.card);
-        cards.forEach(card => {
+        cards.forEach((card, index) => {
+            card.style.setProperty('--card-index', index);
+            this.addFeatureIconAnimations(card);
             this.addButtonAnimations(card);
         });
     }
 
+    addFeatureIconAnimations(card) {
+        const features = card.querySelectorAll('.feature-badges i');
+        features.forEach(icon => {
+            icon.addEventListener(this.EVENTS.MOUSEOVER, () => {
+                icon.style.transform = 'scale(1.2) rotate(8deg)';
+            });
+
+            icon.addEventListener(this.EVENTS.MOUSEOUT, () => {
+                icon.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    }
+
     addButtonAnimations(card) {
-        const buttons = card.querySelectorAll('.buttons a');
+        const buttons = card.querySelectorAll(this.SELECTORS.buttons);
         buttons.forEach(button => {
-
             button.addEventListener(this.EVENTS.MOUSEOVER, () => {
-
-                button.classList.add('button-hover');
+                button.style.transform = 'translateY(-2px)';
             });
 
             button.addEventListener(this.EVENTS.MOUSEOUT, () => {
-
-                button.classList.remove('button-hover');
+                button.style.transform = 'translateY(0)';
             });
         });
+    }
+
+    addCopyFeature() {
+        document.querySelectorAll(this.SELECTORS.downloadBtn).forEach(button => {
+            button.addEventListener(this.EVENTS.CLICK, async (event) => {
+                event.preventDefault();
+                try {
+                    await navigator.clipboard.writeText(button.href);
+                    this.showCopyFeedback(button);
+                } catch (error) {
+                    console.error('Failed to copy text:', error);
+                }
+            });
+        });
+    }
+
+    showCopyFeedback(button) {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.disabled = true;
+
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.disabled = false;
+        }, 2000);
+    }
+
+    addPlatformDetails() {
+        document.querySelectorAll(this.SELECTORS.platformIcons).forEach(icon => {
+            const platformName = icon.getAttribute('title');
+            const isActive = icon.classList.contains('active');
+            icon.setAttribute('data-tooltip', 
+                `${platformName}: ${isActive ? 'Supported' : 'Not Supported'}`
+            );
+        });
+    }
+
+    addGlitchEffects() {
+
+        const siteTitle = document.querySelector('header h1.neonText');
+        if (siteTitle) {
+            siteTitle.classList.add('glitch-on-hover');
+
+            setInterval(() => {
+                siteTitle.classList.add('active-glitch');
+                setTimeout(() => {
+                    siteTitle.classList.remove('active-glitch');
+                }, 2000);
+            }, 8000);
+        }
+
+        const glitchElements = document.querySelectorAll('.glitch-on-hover');
+        setInterval(() => {
+            const randomElement = glitchElements[Math.floor(Math.random() * glitchElements.length)];
+            if (randomElement) {
+                randomElement.classList.add('active-glitch');
+                setTimeout(() => {
+                    randomElement.classList.remove('active-glitch');
+                }, 1500);
+            }
+        }, 5000);
     }
 }
