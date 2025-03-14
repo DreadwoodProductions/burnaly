@@ -518,6 +518,8 @@ select:hover {
     transform-style: preserve-3d;
     position: relative;
     z-index: 5;
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.17, 0.67, 0.29, 0.99);
 }
 
 .buttons a {
