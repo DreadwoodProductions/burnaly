@@ -1,238 +1,275 @@
 @keyframes glitchEffect {
-  0% {
-    text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75),
-                -0.05em -0.025em 0 rgba(0, 255, 255, 0.75),
-                -0.025em 0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  14% {
-    text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75),
-                -0.05em -0.025em 0 rgba(0, 255, 255, 0.75),
-                -0.025em 0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  15% {
-    text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75),
-                0.025em 0.025em 0 rgba(0, 255, 255, 0.75),
-                -0.05em -0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  49% {
-    text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75),
-                0.025em 0.025em 0 rgba(0, 255, 255, 0.75),
-                -0.05em -0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  50% {
-    text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75),
-                0.05em 0 0 rgba(0, 255, 255, 0.75),
-                0 -0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  99% {
-    text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75),
-                0.05em 0 0 rgba(0, 255, 255, 0.75),
-                0 -0.05em 0 rgba(0, 255, 0, 0.75);
-  }
-  100% {
-    text-shadow: -0.025em 0 0 rgba(255, 0, 255, 0.75),
-                -0.025em -0.025em 0 rgba(0, 255, 255, 0.75),
-                -0.025em -0.05em 0 rgba(0, 255, 0, 0.75);
-  }
+    0% {
+        text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75),
+            -0.05em -0.025em 0 rgba(0, 255, 255, 0.75),
+            -0.025em 0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    14% {
+        text-shadow: 0.05em 0 0 rgba(255, 0, 255, 0.75),
+            -0.05em -0.025em 0 rgba(0, 255, 255, 0.75),
+            -0.025em 0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    15% {
+        text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75),
+            0.025em 0.025em 0 rgba(0, 255, 255, 0.75),
+            -0.05em -0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    49% {
+        text-shadow: -0.05em -0.025em 0 rgba(255, 0, 255, 0.75),
+            0.025em 0.025em 0 rgba(0, 255, 255, 0.75),
+            -0.05em -0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    50% {
+        text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75),
+            0.05em 0 0 rgba(0, 255, 255, 0.75),
+            0 -0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    99% {
+        text-shadow: 0.025em 0.05em 0 rgba(255, 0, 255, 0.75),
+            0.05em 0 0 rgba(0, 255, 255, 0.75),
+            0 -0.05em 0 rgba(0, 255, 0, 0.75);
+    }
+
+    100% {
+        text-shadow: -0.025em 0 0 rgba(255, 0, 255, 0.75),
+            -0.025em -0.025em 0 rgba(0, 255, 255, 0.75),
+            -0.025em -0.05em 0 rgba(0, 255, 0, 0.75);
+    }
 }
 
 @keyframes textShift {
-  0% {
-    transform: translate(0);
-  }
-  2% {
-    transform: translate(3px, -3px);
-  }
-  4% {
-    transform: translate(-3px, 2px);
-  }
-  6% {
-    transform: translate(0);
-  }
-  8% {
-    transform: translate(2px, -1px);
-  }
-  10% {
-    transform: translate(0);
-  }
-  100% {
-    transform: translate(0);
-  }
+    0% {
+        transform: translate(0);
+    }
+
+    2% {
+        transform: translate(3px, -3px);
+    }
+
+    4% {
+        transform: translate(-3px, 2px);
+    }
+
+    6% {
+        transform: translate(0);
+    }
+
+    8% {
+        transform: translate(2px, -1px);
+    }
+
+    10% {
+        transform: translate(0);
+    }
+
+    100% {
+        transform: translate(0);
+    }
 }
 
 @keyframes textFlicker {
-  0% {
-    opacity: 1;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  10.5% {
-    opacity: 1;
-  }
-  11% {
-    opacity: 0.4;
-  }
-  11.5% {
-    opacity: 1;
-  }
-  48% {
-    opacity: 1;
-  }
-  49% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-  }
+    0% {
+        opacity: 1;
+    }
+
+    10% {
+        opacity: 0.8;
+    }
+
+    10.5% {
+        opacity: 1;
+    }
+
+    11% {
+        opacity: 0.4;
+    }
+
+    11.5% {
+        opacity: 1;
+    }
+
+    48% {
+        opacity: 1;
+    }
+
+    49% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 @keyframes glitchLine {
-  0% {
-    transform: translateX(-100%);
-  }
-  10%, 90% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    10%,
+    90% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .glitch-on-hover {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .card:hover .glitch-on-hover {
-  animation: glitchEffect 2s infinite;
+    animation: glitchEffect 2s infinite;
 }
 
 .glitch-on-hover.active-glitch {
-  animation: glitchEffect 2s infinite, textShift 3s infinite;
+    animation: glitchEffect 2s infinite, textShift 3s infinite;
 }
 
 .card-header h3.glitch-on-hover {
-  position: relative;
+    position: relative;
 }
 
 .card:hover .card-header h3.glitch-on-hover {
-  animation: glitchEffect 2s infinite;
-  
-  background-image: none;
-  -webkit-text-fill-color: var(--color-text, #fff);
-}
-
-.buttons a.glitch-on-hover:hover {
-  animation: glitchEffect 1.5s infinite;
+    animation: glitchEffect 2s infinite;
+    
+    background-image: none;
+    -webkit-text-fill-color: var(--color-text, #fff);
 }
 
 .glitch-element {
-  position: relative;
+    position: relative;
 }
 
 .glitch-element::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--color-accent, #0ff);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-  transform: translateY(-5px);
-  animation: glitchLine 2s infinite linear;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-accent, #0ff);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    transform: translateY(-5px);
+    animation: glitchLine 2s infinite linear;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .card:hover .glitch-element::before {
-  opacity: 1;
+    opacity: 1;
 }
 
 .flicker-text {
-  display: inline-block;
+    display: inline-block;
 }
 
 .card:hover .flicker-text {
-  animation: textFlicker 4s linear infinite;
+    animation: textFlicker 4s linear infinite;
 }
 
 h1.neonText.glitch-on-hover {
-  position: relative;
+    position: relative;
 }
 
 h1.neonText.glitch-on-hover::before,
 h1.neonText.glitch-on-hover::after {
-  content: 'Burnaly';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+    content: 'Burnaly';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 }
 
 h1.neonText.glitch-on-hover::before {
-  color: #ff00ff;
-  z-index: -1;
+    color: #ff00ff;
+    z-index: -1;
 }
 
 h1.neonText.glitch-on-hover::after {
-  color: #00ffff;
-  z-index: -2;
+    color: #00ffff;
+    z-index: -2;
 }
 
 h1.neonText.glitch-on-hover.active-glitch::before {
-  animation: glitchText 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    animation: glitchText 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
 }
 
 h1.neonText.glitch-on-hover.active-glitch::after {
-  animation: glitchText 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+    animation: glitchText 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
 }
 
 @keyframes glitchText {
-  0% {
-    transform: translate(0);
-    opacity: 0;
-  }
-  20% {
-    transform: translate(-3px, 3px);
-    opacity: 0.7;
-  }
-  40% {
-    transform: translate(-3px, -3px);
-    opacity: 0.7;
-  }
-  60% {
-    transform: translate(3px, 3px);
-    opacity: 0;
-  }
-  80% {
-    transform: translate(3px, -3px);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translate(0);
-    opacity: 0;
-  }
+    0% {
+        transform: translate(0);
+        opacity: 0;
+    }
+
+    20% {
+        transform: translate(-3px, 3px);
+        opacity: 0.7;
+    }
+
+    40% {
+        transform: translate(-3px, -3px);
+        opacity: 0.7;
+    }
+
+    60% {
+        transform: translate(3px, 3px);
+        opacity: 0;
+    }
+
+    80% {
+        transform: translate(3px, -3px);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: translate(0);
+        opacity: 0;
+    }
 }
 
 .status-badge.supported .glitch-on-hover {
-  color: #00ff00;
+    color: #00ff00;
 }
 
 .status-badge.unsupported .glitch-on-hover {
-  color: #ff0000;
+    color: #ff0000;
 }
 
-.search-box input:focus + i {
-  animation: textFlicker 4s linear infinite;
+.search-box input:focus+i {
+    animation: textFlicker 4s linear infinite;
 }
 
 .filter-controls select:focus {
-  animation: glitchEffect 2s infinite;
+    animation: glitchEffect 2s infinite;
+}
+
+.card:hover .buttons a i {
+    animation: textFlicker 6s infinite;
+}
+
+.card:hover .buttons a:hover::after {
+    animation: glitchLine 2s infinite linear;
+    opacity: 1;
+}
+
+.buttons a {
+    transition: all 0.4s cubic-bezier(0.17, 0.67, 0.29, 0.99);
 }
