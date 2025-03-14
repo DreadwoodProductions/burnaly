@@ -289,16 +289,17 @@ class ExecutorApp {
     }
 
     addButtonAnimations(card) {
-        const buttons = card.querySelectorAll(this.SELECTORS.buttons);
-        buttons.forEach(button => {
-            button.addEventListener(this.EVENTS.MOUSEOVER, () => {
-                button.style.transform = 'translateY(-102px)';
+        const buttonsContainer = card.querySelector('.buttons');
+    
+        if (buttonsContainer) {
+            buttonsContainer.addEventListener(this.EVENTS.MOUSEOVER, () => {
+                buttonsContainer.style.transform = 'translateZ(30px)';
             });
-
-            button.addEventListener(this.EVENTS.MOUSEOUT, () => {
-                button.style.transform = 'translateY(-100px)';
+            
+            buttonsContainer.addEventListener(this.EVENTS.MOUSEOUT, () => {
+                buttonsContainer.style.transform = 'translateZ(0)';
             });
-        });
+        }
     }
 
     addCopyFeature() {
