@@ -56,6 +56,7 @@ class ExecutorApp {
         this.addCopyFeature();
         this.addPlatformDetails();
         this.addGlitchEffects(); 
+        this.addParticlesToCards();
     }
 
     createLoadingState() {
@@ -348,4 +349,22 @@ class ExecutorApp {
             }
         }, 5000);
     }
+
+    addParticlesToCards() {
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+          if (!card.querySelector('.particles')) {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.className = 'particles';
+            
+            for (let i = 0; i < 5; i++) {
+              const particle = document.createElement('span');
+              particlesContainer.appendChild(particle);
+            }
+            
+            card.insertBefore(particlesContainer, card.firstChild);
+          }
+        });
+      }
 }
