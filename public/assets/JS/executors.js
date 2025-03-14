@@ -296,7 +296,7 @@ class ExecutorApp {
             });
 
             button.addEventListener(this.EVENTS.MOUSEOUT, () => {
-                button.style.transform = 'translateY(-100)';
+                button.style.transform = 'translateY(-100px)';
             });
         });
     }
