@@ -272,7 +272,6 @@ class ExecutorApp {
         cards.forEach((card, index) => {
             card.style.setProperty('--card-index', index);
             this.addFeatureIconAnimations(card);
-            this.addButtonAnimations(card);
         });
     }
 
