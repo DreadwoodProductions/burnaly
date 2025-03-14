@@ -288,20 +288,6 @@ class ExecutorApp {
         });
     }
 
-    addButtonAnimations(card) {
-        const buttonsContainer = card.querySelector('.buttons');
-    
-        if (buttonsContainer) {
-            buttonsContainer.addEventListener(this.EVENTS.MOUSEOVER, () => {
-                buttonsContainer.style.transform = 'translateZ(30px)';
-            });
-            
-            buttonsContainer.addEventListener(this.EVENTS.MOUSEOUT, () => {
-                buttonsContainer.style.transform = 'translateZ(0)';
-            });
-        }
-    }
-
     addCopyFeature() {
         document.querySelectorAll(this.SELECTORS.downloadBtn).forEach(button => {
             button.addEventListener(this.EVENTS.CLICK, async (event) => {
