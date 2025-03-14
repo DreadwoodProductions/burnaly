@@ -1,6 +1,4 @@
 :root {
-
-    
     --color-primary: #8a2be2;
     --color-secondary: #4b0082;
     --color-accent: #ff00ff;
@@ -12,18 +10,15 @@
     --color-gradient-bg: linear-gradient(135deg, var(--color-card-bg), rgba(15, 15, 26, 0.98));
     --color-gradient-mesh: radial-gradient(circle at top right, rgba(138, 43, 226, 0.15), transparent 50%);
     --color-gradient-hover: rgba(138, 43, 226, 0.25);
-
     
     --transition-default: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
     
     --spacing: 0.5rem 1rem 2rem 3rem;
     --spacing-sm: var(--spacing, 0.5rem);
     --spacing-md: var(--spacing, 1rem);
     --spacing-lg: var(--spacing, 2rem);
     --spacing-xl: var(--spacing, 3rem);
-
     
     --border-radius: 12px;
     --shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
@@ -61,6 +56,7 @@ header {
     margin-bottom: var(--spacing-xl);
     box-shadow: var(--shadow);
     animation: headerEntrance 1s ease-out;
+    text-align: center;
 }
 
 .neonText {
@@ -71,6 +67,9 @@ header {
         0 0 30px var(--color-accent);
     margin-bottom: var(--spacing-lg);
     animation: neonPulse 1.5s infinite alternate;
+    width: 100%;
+    display: block;
+    position: relative;
 }
 
 .controls {
@@ -275,18 +274,18 @@ select:hover {
 }
 
 .card:hover .particles {
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .card .particles span {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     background: var(--color-accent);
     border-radius: 50%;
-    box-shadow: 0 0 15px 5px rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 20px 8px rgba(255, 0, 255, 0.6);
     animation: particleDrift 6s infinite linear;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .card .particles span:nth-child(1) {
@@ -765,6 +764,24 @@ select:hover {
 .card:hover .reading-time i {
     opacity: 1;
     color: var(--color-accent);
+}
+
+@keyframes particleDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-50px) translateX(20px);
+  }
+  50% {
+    transform: translateY(0) translateX(40px);
+  }
+  75% {
+    transform: translateY(50px) translateX(20px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
 }
 
 @keyframes shimmerText {
