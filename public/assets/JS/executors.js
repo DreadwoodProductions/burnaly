@@ -292,11 +292,11 @@ class ExecutorApp {
         const buttons = card.querySelectorAll(this.SELECTORS.buttons);
         buttons.forEach(button => {
             button.addEventListener(this.EVENTS.MOUSEOVER, () => {
-                button.style.transform = 'translateY(-2px)';
+                button.style.transform = 'translateY(-102px)';
             });
 
             button.addEventListener(this.EVENTS.MOUSEOUT, () => {
-                button.style.transform = 'translateY(0)';
+                button.style.transform = 'translateY(-100)';
             });
         });
     }
